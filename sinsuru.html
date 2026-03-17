@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>神ソシャゲ</title>
+
+<style>
+body{margin:0;background:#0b0f1a;color:#fff;font-family:sans-serif}
+.screen{display:none;padding:10px;text-align:center}
+.active{display:block}
+
+.fire{border:3px solid #ff4444}
+.water{border:3px solid #4488ff}
+.thunder{border:3px solid #ffd700}
+.wood{border:3px solid #44cc44}
+
+.card{
+display:inline-block;
+background:#1a1f2e;
+padding:6px;margin:5px;
+border-radius:10px;width:95px;
+}
+.card img{width:100%;border-radius:8px}
+.ssr{box-shadow:0 0 20px gold}
+
+.rarity{
+font-size:12px;
+color:gold;
+font-weight:bold;
+margin-bottom:2px;
+}
+
+.flash{
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:radial-gradient(circle,rgba(255,255,255,0.8),transparent);
+animation:flash 0.6s;
+}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+
+.flip{position:relative;width:90px;height:120px;transform-style:preserve-3d;transition:0.6s}
+.open .flip{transform:rotateY(180deg)}
+.front,.back{
+position:absolute;width:100%;height:100%;
+backface-visibility:hidden;border-radius:10px;
+}
+.front{background:#444}
+.back{transform:rotateY(180deg);background:#1a1f2e}
+
+#battleMain{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+max-width:520px;
+margin:auto;
+}
+
+.teamArea{
+display:flex;
+flex-direction:column;
+gap:8px;
+width:40%;
+align-items:center;
+}
+
+#enemyArea{
+width:55%;
+display:flex;
+justify-content:center;
+}
+
+.unit{
+background:#1a1f2e;
+padding:6px;
+border-radius:12px;
+font-size:11px;
+position:relative;
+}
+
+.ally{width:140px;}
+.unit img{
+width:100%;
+max-height:90px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.enemy{width:160px;}
+
+.turn{
+outline:2px solid yellow;
+box-shadow:0 0 6px yellow;
+}
+
+.bar{background:#333;height:8px;border-radius:5px;margin-top:3px;}
+.hp{background:#4caf50;height:8px;}
+.gauge{background:#ff9800;height:6px;}
+
+.damage{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(1);
+font-size:28px;
+font-weight:bold;
+color:#fff;
+text-shadow:0 0 10px #000,0 0 5px #000;
+animation:damagePop 0.9s forwards;
+pointer-events:none;
+}
+
+@keyframes damagePop{
+0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}
+20%{opacity:1;transform:translate(-50%,-60%) scale(1.2);}
+100%{opacity:0;transform:translate(-50%,-100%) scale(0.8);}
+}
+
+.weak{color:#ff4444}
+.resist{color:#44aaff}
+.rainbowFlash{
+position:fixed;
+top:0;left:0;width:100%;height:100%;
+background:linear-gradient(45deg, red, orange, yellow, green, cyan, blue, purple);
+opacity:0.8;
+animation:rainbow 0.8s forwards;
+z-index:999;
+}
+
+@keyframes rainbow{
+0%{opacity:1;}
+100%{opacity:0;}
+}
+
+.shake{
+animation:shake 0.4s;
+}
+
+@keyframes shake{
+0%{transform:translate(0,0);}
+25%{transform:translate(-5px,5px);}
+50%{transform:translate(5px,-5px);}
+75%{transform:translate(-5px,5px);}
+100%{transform:translate(0,0);}
+}
+
+.ultra{
+box-shadow:0 0 25px cyan,0 0 40px magenta;
+animation:glow 1s infinite alternate;
+}
+
+@keyframes glow{
+from{filter:brightness(1);}
+to{filter:brightness(1.6);}
+}
+</style>
+</head>
+
+<body>
+
+<div id="title" class="screen active">
+<h1>神ソシャゲ</h1>
+<button onclick="go('gacha')">ガチャ</button>
+<button onclick="go('party')">編成</button>
+<button onclick="go('trial')">試練</button>
+<button onclick="resetData()">データリセット</button>
+</div>
+
+<div id="gacha" class="screen">
+石:<span id="stone"></span><br>
+<button onclick="draw1()">単発</button>
+<button onclick="draw10()">10連</button>
+<div id="gachaResult"></div>
+<button onclick="go('title')">戻る</button>
+</div>
+
+<div id="party" class="screen">
+<h2>編成</h2>
+<select onchange="sortBox(this.value)">
+<option value="">並べ替え</option>
+<option value="atk">ATK順</option>
+<option value="hp">HP順</option>
+<option value="rarity">レア順</option>
+<option value="dupe">凸順</option>
+</select>
+
+<div id="box"></div>
+<h3>チーム</h3>
+
+
+<div id="teamBuff" style="margin:10px;font-weight:bold;color:#ffd700;"></div>
+
+<div id="teamTotal"></div>
+
+<div id="team"></div>
+
+<button onclick="go('title')">戻る</button>
+</div>
+
+<div id="trial" class="screen">
+<h2>試練</h2>
+<div id="trialList"></div>
+<button onclick="go('title')">戻る</button>
+
+
+</div>
+
+<div id="battle" class="screen">
+<div id="battleMain">
+<div class="teamArea" id="teamArea"></div>
+<div id="enemyArea"></div>
+</div>
+<div id="actions"></div>
+</div>
+
+<script>
+function applyTeamBuff(players){
+let atkBuff = 0;
+let hpBuff = 0;
+
+// チーム内のレアリティでバフ加算
+players.forEach(p=>{
+    if(p.rarity === 4){
+        atkBuff += 0.30;
+        hpBuff += 0.30;
+    }else if(p.rarity === 3){
+        atkBuff += 0.15;
+        hpBuff += 0.15;
+    }
+});
+
+// 上限つけたいならここで制限も可能（例：最大50%）
+// atkBuff = Math.min(atkBuff, 0.5);
+// hpBuff = Math.min(hpBuff, 0.5);
+
+// 実際に反映
+return players.map(p=>{
+    return {
+        ...p,
+        atk: Math.floor(p.atk * (1 + atkBuff)),
+        hp: Math.floor(p.hp * (1 + hpBuff)),
+        currentHp: Math.floor(p.hp * (1 + hpBuff)),
+        ult: 0
+    };
+});
+}
+
+function saveData(){
+const data = {
+stone,
+box,
+team,
+progress
+};
+localStorage.setItem("gachaData", JSON.stringify(data));
+}
+
+function loadData(){
+const data = JSON.parse(localStorage.getItem("gachaData"));
+if(!data) return;
+
+stone = data.stone ?? 100;
+box = data.box ?? [];
+team = data.team ?? [];
+progress = data.progress ?? {};
+}
+
+let stone=100;
+let box=[],team=[],players=[],enemy;
+let turn="player",turnIndex=0;
+let progress={};
+
+const attrClass={火:"fire",水:"water",雷:"thunder",木:"wood"};
+const advantage={火:"木",木:"雷",雷:"水",水:"火"};
+
+const chars=[
+{name:"室井元武",rarity:1,attr:"火",img:"https://imgur.com/21T5sVB.png"},
+{name:"栗島トウヤ",rarity:1,attr:"水",img:"https://imgur.com/JpAvqiZ.png"},
+{name:"鈴鹿",rarity:1,attr:"木",img:"https://imgur.com/MBOQolS.png"},
+{name:"死橋轟",rarity:1,attr:"雷",img:"https://imgur.com/tvliiOf.png"},
+{name:"沢華",rarity:2,attr:"水",img:"https://imgur.com/DQT7uSa.png"},
+{name:"阿波牛壬陸",rarity:2,attr:"木",img:"https://imgur.com/FBI0zPO.png"},
+{name:"阿波牛星夜",rarity:3,attr:"水",img:"https://imgur.com/OcMPZTg.png"},
+{name:"コード5.2",rarity:3,attr:"火",img:"https://imgur.com/BrAAtqj.png"},
+{name:"FqEa",rarity:3,attr:"雷",img:"https://imgur.com/sdukWOg.png"},
+
+{name:"湯照司吉基",rarity:2,attr:"雷",img:"https://imgur.com/iyTDOdd.png"},
+{name:"明石啓希",rarity:2,attr:"火",img:"https://imgur.com/7TubUu2.png"},
+{name:"珠濃雅紀",rarity:2,attr:"水",img:"https://imgur.com/5Ib43mV.png"},
+{name:"黒峰天音",rarity:3,attr:"火",img:"https://imgur.com/76908qZ.png"},
+{name:"晴海亭",rarity:2,attr:"木",img:"https://imgur.com/yVckkYt.png"},
+{name:"甲斐翔也",rarity:3,attr:"木",img:"https://imgur.com/BrNyp9Z.png"},
+{name:"赤羽悠真",rarity:2,attr:"雷",img:"https://imgur.com/7bxMy83.png"},
+{name:"桜木彰",rarity:2,attr:"火",img:"https://imgur.com/PqQS7xN.png"},
+{name:"八並解徒",rarity:2,attr:"木",img:"https://imgur.com/S58UnRP.png"},
+
+{name:"玉垣剣城",rarity:3,attr:"雷",img:"https://imgur.com/D0PXU4L.png"},
+{name:"蒼井朔也",rarity:3,attr:"火",img:"https://imgur.com/hlaEw0j.png"},
+{name:"石倉有栖",rarity:3,attr:"木",img:"https://imgur.com/luNtrHV.png"},
+{name:"ミニモータ",rarity:3,attr:"木",img:"https://imgur.com/BPKBRAK.png"},
+{name:"ソーメーン",rarity:3,attr:"雷",img:"https://imgur.com/dGE9dXV.png"},
+{name:"跳田収滋",rarity:3,attr:"水",img:"https://imgur.com/Bw5qyja.png"},
+{name:"オリバー",rarity:3,attr:"水",img:"https://imgur.com/57Rlf7D.png"},
+
+{name:"弐呪刻",rarity:4,attr:"水",img:"https://imgur.com/qAGbxYV.png"},
+{name:"黒瀬武人",rarity:3,attr:"火",img:"https://imgur.com/pgQHlal.png"},
+{name:"フセイン",rarity:4,attr:"雷",img:"https://imgur.com/Yr0obwq.png"},
+{name:"リボルト",rarity:4,attr:"木",img:"https://imgur.com/RSHrI9C.png"},
+{name:"死橋凪",rarity:4,attr:"火",img:"https://imgur.com/Wofj47Z.png"},
+{name:"アステレス",rarity:4,attr:"水",img:"https://imgur.com/XU6EFZa.png"},
+{name:"バルナウス",rarity:4,attr:"火",img:"https://imgur.com/3mibLSW.png"},
+
+{name:"ゲガント",rarity:1,attr:"木",img:"https://imgur.com/dXFpBIJ.png"},
+{name:"ホーレン",rarity:1,attr:"水",img:"https://imgur.com/r15mpbr.png"},
+{name:"ボムブ",rarity:1,attr:"火",img:"https://imgur.com/LgYOzQ0.png"},
+{name:"霊剛",rarity:1,attr:"雷",img:"https://imgur.com/8vB105H.png"},
+{name:"安村康夫",rarity:1,attr:"火",img:"https://imgur.com/i9NJyA0.png"},
+{name:"返網転",rarity:1,attr:"水",img:"https://imgur.com/n3nrGmp.png"},
+{name:"和辺重治",rarity:1,attr:"雷",img:"https://imgur.com/e2bzfCJ.png"},
+{name:"和辺重信",rarity:1,attr:"木",img:"https://imgur.com/aUgF1Uf.png"},
+{name:"ヒナル",rarity:1,attr:"雷",img:"https://imgur.com/bvVouas.png"},
+{name:"マタイ",rarity:1,attr:"木",img:"https://imgur.com/wnIKk8n.png"},
+{name:"ログフ",rarity:1,attr:"火",img:"https://imgur.com/3sgyjeg.png"}
+];
+
+function star(r){return "★".repeat(r);}
+
+function getGachaChar(){
+let r=Math.random();
+let rarity;
+if(r < 0.70) rarity = 1;
+else if(r < 0.90) rarity = 2;
+else if(r < 0.99)rarity = 3;
+else rarity =4;
+
+let pool = chars.filter(c=>c.rarity==rarity);
+return pool[Math.random()*pool.length|0];
+}
+
+function go(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+update();
+if(id==="trial")renderTrials();
+}
+function draw1(){
+if(stone < 10) return;
+stone -= 10;
+
+gachaResult.innerHTML="";
+
+// 演出
+let flash=document.createElement("div");
+flash.className="flash";
+document.body.appendChild(flash);
+setTimeout(()=>flash.remove(),600);
+
+// キャラ取得
+let c = getGachaChar();
+
+// 表示
+// ☆4専用演出
+if(c.rarity === 4){
+
+// 虹フラッシュ
+let rainbow=document.createElement("div");
+rainbow.className="rainbowFlash";
+document.body.appendChild(rainbow);
+setTimeout(()=>rainbow.remove(),800);
+
+// 画面揺れ
+document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
+
+update();
+saveData();
+
+}
+let div=document.createElement("div");
+div.className=`card ${attrClass[c.attr]}`;
+div.innerHTML=`
+<div class="flip">
+<div class="front"></div>
+<div class="back ${c.rarity==3?"ssr":""}">
+<div class="rarity">${star(c.rarity)}</div>
+<img src="${c.img}">
+${c.name}
+</div>
+</div>`;
+gachaResult.appendChild(div);
+setTimeout(()=>div.classList.add("open"),50);
+
+// BOX処理（凸含む）
+let exist=box.find(b=>b.name===c.name);
+if(exist){
+exist.dupe++;
+
+// レアごとの上昇量
+let atkUp=0,hpUp=0;
+
+if(exist.rarity===1){
+    atkUp=2; hpUp=5;
+}else if(exist.rarity===2){
+    atkUp=4; hpUp=10;
+}else if(exist.rarity===3){
+    atkUp=8; hpUp=20;
+}else if(exist.rarity===4){
+    atkUp=16; hpUp=40;
+}
+exist.atk += atkUp;
+exist.hp += hpUp;
+
+}else{
+box.push({...c,dupe:0,atk:20+5*c.rarity,hp:100+20*c.rarity});
+}
+
+update();
+}
+
+function draw10(){
+if(stone<100)return;
+stone-=100;
+
+gachaResult.innerHTML="";
+
+let flash=document.createElement("div");
+flash.className="flash";
+document.body.appendChild(flash);
+setTimeout(()=>flash.remove(),600);
+
+let results=[];
+
+for(let i=0;i<9;i++){
+results.push(getGachaChar());
+
+update();
+saveData();
+}
+
+let ssr=chars.filter(c=>c.rarity==3);
+results.push(ssr[Math.random()*ssr.length|0]);
+
+results.forEach((c,i)=>{
+if(c.rarity === 4){
+
+let rainbow=document.createElement("div");
+rainbow.className="rainbowFlash";
+document.body.appendChild(rainbow);
+setTimeout(()=>rainbow.remove(),800);
+
+document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
+
+}
+setTimeout(()=>{
+let div=document.createElement("div");
+div.className=`card ${attrClass[c.attr]}`;
+div.innerHTML=`
+<div class="flip">
+<div class="front"></div><div class="back ${c.rarity==3?"ssr":""} ${c.rarity==4?"ultra":""}">
+<div class="rarity">${star(c.rarity)}</div>
+<img src="${c.img}">
+${c.name}
+</div>
+</div>`;
+gachaResult.appendChild(div);
+setTimeout(()=>div.classList.add("open"),50);
+
+let exist=box.find(b=>b.name===c.name);
+if(exist){
+exist.dupe++;
+
+// レアリティごとの凸上昇量
+let atkUp = 0;
+let hpUp = 0;
+
+if(exist.rarity === 1){
+    atkUp = 2;
+    hpUp = 5;
+}else if(exist.rarity === 2){
+    atkUp = 4;
+    hpUp = 10;
+}else if(exist.rarity === 3){
+    atkUp = 8;
+    hpUp = 20;
+}else if(exist.rarity === 4){
+    atkUp = 16;
+    hpUp = 40;
+}
+
+exist.atk += atkUp;
+exist.hp += hpUp;
+
+}else{
+box.push({...c,dupe:0,atk:20+5*c.rarity,hp:100+20*c.rarity});
+}
+
+},i*250);
+});
+
+update();
+}
+
+function sortBox(type){
+if(type==="atk")box.sort((a,b)=>b.atk-a.atk);
+if(type==="hp")box.sort((a,b)=>b.hp-a.hp);
+if(type==="rarity")box.sort((a,b)=>b.rarity-a.rarity);
+if(type==="dupe")box.sort((a,b)=>b.dupe-a.dupe);
+update();
+}
+
+function update(){
+let s=document.getElementById("stone");
+if(s)s.textContent=stone;
+
+let b=document.getElementById("box");
+if(b)b.innerHTML=box.map((c,i)=>`
+<div class="card ${attrClass[c.attr]}" onclick="add(${i})">
+<div class="rarity">${star(c.rarity)}</div>
+<img src="${c.img}">
+${c.name}<br>
+HP:${c.hp} ATK:${c.atk}<br>
+凸:${c.dupe}
+</div>`).join("");
+
+let t=document.getElementById("team");
+if(t)t.innerHTML=team.map((c,i)=>`
+<div class="card ${attrClass[c.attr]}" onclick="remove(${i})">
+<div class="rarity">${star(c.rarity)}</div>
+<img src="${c.img}">
+</div>`).join("");
+let buffDiv = document.getElementById("teamBuff");
+
+if(buffDiv){
+
+let buff = getTeamBuff(team);
+
+// バフ表示
+buffDiv.innerHTML = `
+チームバフ<br>
+ATK +${buff.atk}%<br>
+HP +${buff.hp}%
+`;
+
+// 合計表示
+let totalDiv = document.getElementById("teamTotal");
+
+if(totalDiv){
+
+let totalHP = 0;
+let totalATK = 0;
+
+team.forEach(c=>{
+    totalHP += c.hp;
+    totalATK += c.atk;
+});
+
+let finalHP = Math.floor(totalHP * (1 + buff.hp/100));
+let finalATK = Math.floor(totalATK * (1 + buff.atk/100));
+
+totalDiv.innerHTML = `
+合計ステータス<br>
+HP: ${totalHP} → ${finalHP}<br>
+ATK: ${totalATK} → ${finalATK}
+`;
+}
+
+}
+
+}
+
+function add(i){
+if(team.find(t=>t.name===box[i].name))return;
+if(team.length<3)team.push(box[i]);
+update();
+saveData(); 
+}
+
+function remove(i){
+team.splice(i,1);
+update();
+}
+
+function renderTrials(){
+trialList.innerHTML=chars.map((c,i)=>{
+let lv=progress[i]||1;
+return `<div class="card ${attrClass[c.attr]}">
+<img src="${c.img}">
+${c.name}<br>Lv.${lv}
+<button onclick="startBattle(${i})">挑戦</button>
+</div>`;
+}).join("");
+}
+function startBattle(i){
+go("battle");
+
+let lv=progress[i]||1;
+
+// 🔽ここ変更
+players = applyTeamBuff(team.map(c=>({...c})));
+
+// 敵はそのまま
+enemy={...chars[i],hp:200+lv*80,atk:20+lv*10};
+
+turn="player";turnIndex=0;
+renderBattle();
+}
+
+function calcDamage(a,d,base){
+if(advantage[a]===d)return {dmg:base*1.5,type:"weak"};
+if(advantage[d]===a)return {dmg:base*0.5,type:"resist"};
+return {dmg:base,type:""};
+}
+
+function showDamage(id,res){
+let el=document.getElementById(id);
+
+let div=document.createElement("div");
+div.className="damage";
+
+let color="#fff";
+if(res.type==="weak") color="#ff4444";
+if(res.type==="resist") color="#44aaff";
+
+div.innerHTML=`
+<span style="color:${color}">
+${Math.floor(res.dmg)}
+</span><br>
+<span class="${res.type}">${res.type.toUpperCase()}</span>
+`;
+
+el.appendChild(div);
+setTimeout(()=>div.remove(),900);
+}
+
+function renderBattle(){
+teamArea.innerHTML=players.map((p,i)=>`
+<div class="unit ally ${attrClass[p.attr]} ${i===turnIndex?"turn":""}" id="p${i}">
+<img src="${p.img}">
+${p.name}
+<div>HP:${Math.floor(p.currentHp)}</div>
+<div class="bar"><div class="hp" style="width:${p.currentHp/p.hp*100}%"></div></div>
+<div class="bar"><div class="gauge" style="width:${p.ult}%"></div></div>
+</div>`).join("");
+
+enemyArea.innerHTML=`
+<div class="unit enemy ${attrClass[enemy.attr]}" id="enemy">
+<img src="${enemy.img}">
+${enemy.name}
+<div>HP:${Math.floor(enemy.hp)}</div>
+<div class="bar"><div class="hp" style="width:${enemy.hp/3}%"></div></div>
+</div>`;
+
+actions.innerHTML=
+turn==="player"
+? `<button onclick="attack()">攻撃</button>
+<button onclick="ultimate()">必殺</button>`
+: "敵のターン";
+}
+
+function attack(){
+let p=players[turnIndex];
+let res=calcDamage(p.attr,enemy.attr,p.atk);
+enemy.hp-=res.dmg;
+p.ult+=30;
+showDamage("enemy",res);
+endTurn();
+}
+
+function ultimate(){
+let p=players[turnIndex];
+if(p.ult<100)return;
+let res=calcDamage(p.attr,enemy.attr,p.atk*3);
+enemy.hp-=res.dmg;
+p.ult=0;
+showDamage("enemy",res);
+endTurn();
+}
+
+function enemyTurn(){
+let t=players[Math.random()*players.length|0];
+let res=calcDamage(enemy.attr,t.attr,enemy.atk);
+t.currentHp-=res.dmg;
+showDamage("p"+players.indexOf(t),res);
+
+players=players.filter(p=>p.currentHp>0);
+if(players.length===0){
+alert("敗北");
+go("trial"); // ←追加
+return;
+}
+
+turn="player";turnIndex=0;
+renderBattle();
+}
+
+function endTurn(){
+if(enemy.hp<=0)return win();
+
+turnIndex++;
+if(turnIndex>=players.length){
+turn="enemy";
+setTimeout(enemyTurn,700);
+turnIndex=0;
+}
+renderBattle();
+}
+
+function win(){
+stone+=50;
+let id=chars.findIndex(c=>c.name===enemy.name);
+progress[id]=(progress[id]||1)+1;
+saveData();
+alert("勝利！石+50");
+go("trial");
+}
+
+function resetData(){
+localStorage.removeItem("gachaData");
+location.reload();
+}
+
+loadData();
+update();
+
+function getTeamBuff(team){
+let atkBuff = 0;
+let hpBuff = 0;
+
+team.forEach(c=>{
+    if(c.rarity === 4){
+        atkBuff += 0.30;
+        hpBuff += 0.30;
+    }else if(c.rarity === 3){
+        atkBuff += 0.15;
+        hpBuff += 0.15;
+    }
+});
+
+// 必要なら上限
+// atkBuff = Math.min(atkBuff, 0.5);
+// hpBuff = Math.min(hpBuff, 0.5);
+
+return {
+    atk: Math.floor(atkBuff * 100),
+    hp: Math.floor(hpBuff * 100)
+};
+}
+
+</script>
+</body>
+</html>
