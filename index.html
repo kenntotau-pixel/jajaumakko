@@ -218,16 +218,7 @@ function applyTeamBuff(players){
 let atkBuff = 0;
 let hpBuff = 0;
 
-// チーム内のレアリティでバフ加算
-players.forEach(p=>{
-    if(p.rarity === 4){
-        atkBuff += 0.30;
-        hpBuff += 0.30;
-    }else if(p.rarity === 3){
-        atkBuff += 0.15;
-        hpBuff += 0.15;
-    }
-});
+
 
 // 上限つけたいならここで制限も可能（例：最大50%）
 // atkBuff = Math.min(atkBuff, 0.5);
@@ -240,7 +231,8 @@ return players.map(p=>{
         atk: Math.floor(p.atk * (1 + atkBuff)),
         hp: Math.floor(p.hp * (1 + hpBuff)),
         currentHp: Math.floor(p.hp * (1 + hpBuff)),
-        ult: 0
+        ult: 0,
+        cool: 0 // ←これ
     };
 });
 }
@@ -274,53 +266,96 @@ const attrClass={火:"fire",水:"water",雷:"thunder",木:"wood"};
 const advantage={火:"木",木:"雷",雷:"水",水:"火"};
 
 const chars=[
-{name:"室井元武",rarity:1,attr:"火",img:"https://imgur.com/21T5sVB.png"},
-{name:"栗島トウヤ",rarity:1,attr:"水",img:"https://imgur.com/JpAvqiZ.png"},
-{name:"鈴鹿",rarity:1,attr:"木",img:"https://imgur.com/MBOQolS.png"},
-{name:"死橋轟",rarity:1,attr:"雷",img:"https://imgur.com/tvliiOf.png"},
-{name:"沢華",rarity:2,attr:"水",img:"https://imgur.com/DQT7uSa.png"},
-{name:"阿波牛壬陸",rarity:2,attr:"木",img:"https://imgur.com/FBI0zPO.png"},
-{name:"阿波牛星夜",rarity:3,attr:"水",img:"https://imgur.com/OcMPZTg.png"},
-{name:"コード5.2",rarity:3,attr:"火",img:"https://imgur.com/BrAAtqj.png"},
-{name:"FqEa",rarity:3,attr:"雷",img:"https://imgur.com/sdukWOg.png"},
+{name:"室井元武",rarity:1,attr:"火",img:"https://imgur.com/21T5sVB.png",
+skill:{text:"スキルなし"}},
+{name:"栗島トウヤ",rarity:1,attr:"水",img:"https://imgur.com/JpAvqiZ.png",
+skill:{text:"スキルなし"}},
+{name:"鈴鹿",rarity:1,attr:"木",img:"https://imgur.com/MBOQolS.png",
+skill:{text:"スキルなし"}},
+{name:"死橋轟",rarity:1,attr:"雷",img:"https://imgur.com/tvliiOf.png",
+skill:{text:"スキルなし"}},
+{name:"沢華",rarity:2,attr:"水",img:"https://imgur.com/DQT7uSa.png",
+skill:{type:"debuff", power:0.6, text:"敵弱体40%",cool:3}},
+{name:"阿波牛壬陸",rarity:2,attr:"木",img:"https://imgur.com/FBI0zPO.png",
+ skill:{type:"damage", power:1.5, text:"150%ダメージ",cool:3}},
+{name:"阿波牛星夜",rarity:3,attr:"水",img:"https://imgur.com/OcMPZTg.png",
+skill:{type:"damage", power:2, text:"200%ダメージ",cool:2}},
+{name:"コード5.2",rarity:3,attr:"火",img:"https://imgur.com/BrAAtqj.png",
+skill:{type:"damage", power:3, text:"300%ダメージ",cool:4}},
+{name:"FqEa",rarity:3,attr:"雷",img:"https://imgur.com/sdukWOg.png",
+skill:{type:"multi", power:0.4, hits:5, text:"5連撃+デバフ",cool:3}},
 
-{name:"湯照司吉基",rarity:2,attr:"雷",img:"https://imgur.com/iyTDOdd.png"},
-{name:"明石啓希",rarity:2,attr:"火",img:"https://imgur.com/7TubUu2.png"},
-{name:"珠濃雅紀",rarity:2,attr:"水",img:"https://imgur.com/5Ib43mV.png"},
-{name:"黒峰天音",rarity:3,attr:"火",img:"https://imgur.com/76908qZ.png"},
-{name:"晴海亭",rarity:2,attr:"木",img:"https://imgur.com/yVckkYt.png"},
-{name:"甲斐翔也",rarity:3,attr:"木",img:"https://imgur.com/BrNyp9Z.png"},
-{name:"赤羽悠真",rarity:2,attr:"雷",img:"https://imgur.com/7bxMy83.png"},
-{name:"桜木彰",rarity:2,attr:"火",img:"https://imgur.com/PqQS7xN.png"},
-{name:"八並解徒",rarity:2,attr:"木",img:"https://imgur.com/S58UnRP.png"},
+{name:"湯照司吉基",rarity:2,attr:"雷",img:"https://imgur.com/iyTDOdd.png",
+skill:{type:"poison",power:0.3,text:"30%毒付与",cool:3}},
+{name:"明石啓希",rarity:2,attr:"火",img:"https://imgur.com/7TubUu2.png",
+skill:{type:"teamBuff",power:1.25,text:"全体atk上昇25%",cool:3}},
+{name:"珠濃雅紀",rarity:2,attr:"水",img:"https://imgur.com/5Ib43mV.png",
+skill:{type:"heal", power:0.3, text:"味方回復30%",cool:3}},
+{name:"黒峰天音",rarity:3,attr:"火",img:"https://imgur.com/76908qZ.png",
+skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
+{name:"晴海亭",rarity:2,attr:"木",img:"https://imgur.com/yVckkYt.png",
+skill:{type:"debuff", power:0.6, text:"敵弱体40%",cool:3}},
+{name:"甲斐翔也",rarity:3,attr:"木",img:"https://imgur.com/BrNyp9Z.png",
+skill:{type:"multi", power:0.7, hits:3, text:"3連撃+デバフ",cool:3}},
+{name:"赤羽悠真",rarity:2,attr:"雷",img:"https://imgur.com/7bxMy83.png",
+skill:{type:"heal", power:0.4, text:"味方回復40%",cool:3}},
+{name:"桜木彰",rarity:2,attr:"火",img:"https://imgur.com/PqQS7xN.png",
+skill:{type:"heal", power:0.3, text:"味方回復30%",cool:3}},
+{name:"八並解徒",rarity:2,attr:"木",img:"https://imgur.com/S58UnRP.png",
+skill:{type:"debuff", power:0.6, text:"敵弱体40%",cool:3}},
 
-{name:"玉垣剣城",rarity:3,attr:"雷",img:"https://imgur.com/D0PXU4L.png"},
-{name:"蒼井朔也",rarity:3,attr:"火",img:"https://imgur.com/hlaEw0j.png"},
-{name:"石倉有栖",rarity:3,attr:"木",img:"https://imgur.com/luNtrHV.png"},
-{name:"ミニモータ",rarity:3,attr:"木",img:"https://imgur.com/BPKBRAK.png"},
-{name:"ソーメーン",rarity:3,attr:"雷",img:"https://imgur.com/dGE9dXV.png"},
-{name:"跳田収滋",rarity:3,attr:"水",img:"https://imgur.com/Bw5qyja.png"},
-{name:"オリバー",rarity:3,attr:"水",img:"https://imgur.com/57Rlf7D.png"},
+{name:"玉垣剣城",rarity:3,attr:"雷",img:"https://imgur.com/D0PXU4L.png",
+skill:{type:"damage", power:2, text:"200%ダメージ",cool:2}},
+{name:"蒼井朔也",rarity:3,attr:"火",img:"https://imgur.com/hlaEw0j.png",
+skill:{type:"teamBuff",power:1.40,text:"全体atk上昇40%",cool:3}},
+{name:"石倉有栖",rarity:3,attr:"木",img:"https://imgur.com/luNtrHV.png",
+skill:{type:"heal", power:0.5, text:"味方回復50%",cool:3}},
+{name:"ミニモータ",rarity:3,attr:"木",img:"https://imgur.com/BPKBRAK.png",
+skill:{type:"multi", power:0.4, hits:4, text:"4連撃+デバフ",cool:3}},
+{name:"ソーメーン",rarity:3,attr:"雷",img:"https://imgur.com/dGE9dXV.png",
+skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}},
+{name:"跳田収滋",rarity:3,attr:"水",img:"https://imgur.com/Bw5qyja.png",
+skill:{type:"debuff", power:0.4, text:"敵弱体60%",cool:3}},
+{name:"オリバー",rarity:3,attr:"水",img:"https://imgur.com/57Rlf7D.png",
+skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}},
 
-{name:"弐呪刻",rarity:4,attr:"水",img:"https://imgur.com/qAGbxYV.png"},
-{name:"黒瀬武人",rarity:3,attr:"火",img:"https://imgur.com/pgQHlal.png"},
-{name:"フセイン",rarity:4,attr:"雷",img:"https://imgur.com/Yr0obwq.png"},
-{name:"リボルト",rarity:4,attr:"木",img:"https://imgur.com/RSHrI9C.png"},
-{name:"死橋凪",rarity:4,attr:"火",img:"https://imgur.com/Wofj47Z.png"},
-{name:"アステレス",rarity:4,attr:"水",img:"https://imgur.com/XU6EFZa.png"},
-{name:"バルナウス",rarity:4,attr:"火",img:"https://imgur.com/3mibLSW.png"},
+{name:"弐呪刻",rarity:4,attr:"水",img:"https://imgur.com/qAGbxYV.png",
+skill:{type:"multi", power:0.4, hits:10, text:"10連撃+デバフ",cool:3}},
+{name:"黒瀬武人",rarity:3,attr:"火",img:"https://imgur.com/pgQHlal.png",
+skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
+{name:"フセイン",rarity:4,attr:"雷",img:"https://imgur.com/Yr0obwq.png",
+skill:{type:"debuff", power:0.25, text:"敵弱体75%",cool:4}},
+{name:"リボルト",rarity:4,attr:"木",img:"https://imgur.com/RSHrI9C.png",
+skill:{type:"teamBuff",power:1.6,text:"全体atk上昇60%",cool:3}},
+{name:"死橋凪",rarity:4,attr:"火",img:"https://imgur.com/Wofj47Z.png",
+skill:{type:"damage", power:4.5, text:"450%ダメージ",cool:3}},
+{name:"アステレス",rarity:4,attr:"水",img:"https://imgur.com/XU6EFZa.png",
+skill:{type:"heal", power:0.7, text:"味方回復70%",cool:3}},
+{name:"バルナウス",rarity:4,attr:"火",img:"https://imgur.com/3mibLSW.png",
+skill:{type:"poison",power:0.75,text:"75%毒付与",cool:3}},
 
-{name:"ゲガント",rarity:1,attr:"木",img:"https://imgur.com/dXFpBIJ.png"},
-{name:"ホーレン",rarity:1,attr:"水",img:"https://imgur.com/r15mpbr.png"},
-{name:"ボムブ",rarity:1,attr:"火",img:"https://imgur.com/LgYOzQ0.png"},
-{name:"霊剛",rarity:1,attr:"雷",img:"https://imgur.com/8vB105H.png"},
-{name:"安村康夫",rarity:1,attr:"火",img:"https://imgur.com/i9NJyA0.png"},
-{name:"返網転",rarity:1,attr:"水",img:"https://imgur.com/n3nrGmp.png"},
-{name:"和辺重治",rarity:1,attr:"雷",img:"https://imgur.com/e2bzfCJ.png"},
-{name:"和辺重信",rarity:1,attr:"木",img:"https://imgur.com/aUgF1Uf.png"},
-{name:"ヒナル",rarity:1,attr:"雷",img:"https://imgur.com/bvVouas.png"},
-{name:"マタイ",rarity:1,attr:"木",img:"https://imgur.com/wnIKk8n.png"},
-{name:"ログフ",rarity:1,attr:"火",img:"https://imgur.com/3sgyjeg.png"}
+{name:"ゲガント",rarity:1,attr:"木",img:"https://imgur.com/dXFpBIJ.png",
+skill:{text:"スキルなし"}},
+{name:"ホーレン",rarity:1,attr:"水",img:"https://imgur.com/r15mpbr.png"	,
+skill:{text:"スキルなし"}},
+{name:"ボムブ",rarity:1,attr:"火",img:"https://imgur.com/LgYOzQ0.png",
+skill:{text:"スキルなし"}},
+{name:"霊剛",rarity:1,attr:"雷",img:"https://imgur.com/8vB105H.png",
+skill:{text:"スキルなし"}},
+{name:"安村康夫",rarity:1,attr:"火",img:"https://imgur.com/i9NJyA0.png",
+skill:{text:"スキルなし"}},
+{name:"返網転",rarity:1,attr:"水",img:"https://imgur.com/n3nrGmp.png",
+skill:{text:"スキルなし"}},
+{name:"和辺重治",rarity:1,attr:"雷",img:"https://imgur.com/e2bzfCJ.png",
+skill:{text:"スキルなし"}},
+{name:"和辺重信",rarity:1,attr:"木",img:"https://imgur.com/aUgF1Uf.png",
+skill:{text:"スキルなし"}},
+{name:"ヒナル",rarity:1,attr:"雷",img:"https://imgur.com/bvVouas.png",
+skill:{text:"スキルなし"}},
+{name:"マタイ",rarity:1,attr:"木",img:"https://imgur.com/wnIKk8n.png",
+skill:{text:"スキルなし"}},
+{name:"ログフ",rarity:1,attr:"火",img:"https://imgur.com/3sgyjeg.png",
+skill:{text:"スキルなし"}}
 ];
 
 function star(r){return "★".repeat(r);}
@@ -405,7 +440,7 @@ if(exist.rarity===1){
 }else if(exist.rarity===3){
     atkUp=8; hpUp=20;
 }else if(exist.rarity===4){
-    atkUp=16; hpUp=40;
+    atkUp=32; hpUp=80;
 }
 exist.atk += atkUp;
 exist.hp += hpUp;
@@ -521,6 +556,7 @@ if(b)b.innerHTML=box.map((c,i)=>`
 ${c.name}<br>
 HP:${c.hp} ATK:${c.atk}<br>
 凸:${c.dupe}
+${c.skill ? `<br>スキル:${c.skill.text} (CT:${c.skill.cool||2})` : ""}
 </div>`).join("");
 
 let t=document.getElementById("team");
@@ -597,10 +633,21 @@ go("battle");
 let lv=progress[i]||1;
 
 // 🔽ここ変更
-players = applyTeamBuff(team.map(c=>({...c})));
-
+players = applyTeamBuff(team.map(c=>{
+    let base = chars.find(ch => ch.name === c.name);
+    return {
+        ...c,
+        skill: base?.skill // ←これ追加
+    };
+}));
 // 敵はそのまま
-enemy={...chars[i],hp:200+lv*80,atk:20+lv*10};
+enemy={
+    ...chars[i],
+    hp:200+lv*80,
+    maxHp:200+lv*80, // ←ここ追加🔥
+    atk:20+lv*10,
+    poison:0
+};
 
 turn="player";turnIndex=0;
 renderBattle();
@@ -637,7 +684,8 @@ function renderBattle(){
 teamArea.innerHTML=players.map((p,i)=>`
 <div class="unit ally ${attrClass[p.attr]} ${i===turnIndex?"turn":""}" id="p${i}">
 <img src="${p.img}">
-${p.name}
+${p.name}<br>
+${p.skill ? "★"+p.skill.text : ""}
 <div>HP:${Math.floor(p.currentHp)}</div>
 <div class="bar"><div class="hp" style="width:${p.currentHp/p.hp*100}%"></div></div>
 <div class="bar"><div class="gauge" style="width:${p.ult}%"></div></div>
@@ -648,20 +696,33 @@ enemyArea.innerHTML=`
 <img src="${enemy.img}">
 ${enemy.name}
 <div>HP:${Math.floor(enemy.hp)}</div>
-<div class="bar"><div class="hp" style="width:${enemy.hp/3}%"></div></div>
+<div class="bar"><div class="hp" style="width:${enemy.hp/enemy.maxHp*100}%"></div></div>
 </div>`;
+
+let p = players[turnIndex];
 
 actions.innerHTML=
 turn==="player"
 ? `<button onclick="attack()">攻撃</button>
+<button onclick="skill()" ${p.cool>0?"disabled":""}>
+スキル (${p.cool})
+</button>
 <button onclick="ultimate()">必殺</button>`
 : "敵のターン";
 }
 
 function attack(){
 let p=players[turnIndex];
-let res=calcDamage(p.attr,enemy.attr,p.atk);
+
+// ★ここ追加
+let atk = p.atk;
+if(p.buff && p.buff.turn > 0){
+    atk *= p.buff.power;
+}
+
+let res=calcDamage(p.attr,enemy.attr,atk);
 enemy.hp-=res.dmg;
+
 p.ult+=30;
 showDamage("enemy",res);
 endTurn();
@@ -670,18 +731,53 @@ endTurn();
 function ultimate(){
 let p=players[turnIndex];
 if(p.ult<100)return;
-let res=calcDamage(p.attr,enemy.attr,p.atk*3);
+
+// ★ここ追加
+let atk = p.atk;
+if(p.buff && p.buff.turn > 0){
+    atk *= p.buff.power;
+}
+
+let res=calcDamage(p.attr,enemy.attr,atk*3);
 enemy.hp-=res.dmg;
+
 p.ult=0;
 showDamage("enemy",res);
 endTurn();
 }
 
+players.forEach(p=>{
+    if(p.buff && p.buff.turn > 0){
+        p.buff.turn--;
+        if(p.buff.turn === 0){
+            p.atk /= p.buff.power; // 元に戻す🔥
+        }
+    }
+});
+
 function enemyTurn(){
+// 💀 敵の毒
+if(enemy.poison && enemy.poison.turn > 0){
+
+    let dmg = enemy.poison.atk * enemy.poison.power;
+
+    enemy.hp -= dmg;
+    enemy.poison.turn--;
+}
+
+// 💀 味方の毒
+players.forEach(p=>{
+    if(p.poison > 0){
+        p.currentHp -= 10;
+        p.poison--;
+    }
+});
 let t=players[Math.random()*players.length|0];
 let res=calcDamage(enemy.attr,t.attr,enemy.atk);
 t.currentHp-=res.dmg;
 showDamage("p"+players.indexOf(t),res);
+
+
 
 players=players.filter(p=>p.currentHp>0);
 if(players.length===0){
@@ -694,7 +790,14 @@ turn="player";turnIndex=0;
 renderBattle();
 }
 
+players.forEach(p=>{
+    if(p.cool > 0) p.cool--;
+});
+
 function endTurn(){
+let p = players[turnIndex];
+if(p.cool > 0) p.cool--;
+
 if(enemy.hp<=0)return win();
 
 turnIndex++;
@@ -745,6 +848,71 @@ return {
     atk: Math.floor(atkBuff * 100),
     hp: Math.floor(hpBuff * 100)
 };
+}
+
+function skill(){
+let p = players[turnIndex];
+if(p.cool > 0) return;
+if(!p.skill) return;
+
+let s = p.skill;
+
+// 🔥 ダメージ系
+if(s.type==="damage"){
+    let res = calcDamage(p.attr, enemy.attr, p.atk * s.power);
+    enemy.hp -= res.dmg;
+    showDamage("enemy", res);
+}
+
+// 🔥 多段攻撃
+if(s.type==="multi"){
+    for(let i=0;i<s.hits;i++){
+        let res = calcDamage(p.attr, enemy.attr, p.atk * s.power);
+        enemy.hp -= res.dmg;
+        showDamage("enemy", res);
+    }
+}
+
+// 💚 回復
+if(s.type==="heal"){
+    players.forEach(t=>{
+        t.currentHp += t.hp * s.power;
+        if(t.currentHp > t.hp) t.currentHp = t.hp;
+    });
+}
+
+// 🔺 バフ
+if(s.type==="buff"){
+    p.atk *= s.power;
+}
+
+// 🔻 デバフ
+if(s.type==="debuff"){
+    enemy.atk *= s.power;
+}
+
+if(s.type==="poison"){
+    enemy.poison = {
+        turn: 3,
+        power: s.power,   // 何%
+        atk: p.atk        // 誰のATKか🔥
+    };
+}
+
+if(s.type==="teamBuff"){
+    players.forEach(t=>{
+        t.buff = {
+            turn: 3,
+            power: s.power
+        };
+    });
+}
+
+p.cool = s.cool || 2;
+
+// 👇最後にまとめて
+
+endTurn();
 }
 
 </script>
