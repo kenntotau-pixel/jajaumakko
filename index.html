@@ -215,24 +215,17 @@ to{filter:brightness(1.6);}
 
 <script>
 function applyTeamBuff(players){
-let atkBuff = 0;
-let hpBuff = 0;
 
+let buff = getTeamBuff(players); // ←これ追加
 
-
-// 上限つけたいならここで制限も可能（例：最大50%）
-// atkBuff = Math.min(atkBuff, 0.5);
-// hpBuff = Math.min(hpBuff, 0.5);
-
-// 実際に反映
 return players.map(p=>{
     return {
         ...p,
-        atk: Math.floor(p.atk * (1 + atkBuff)),
-        hp: Math.floor(p.hp * (1 + hpBuff)),
-        currentHp: Math.floor(p.hp * (1 + hpBuff)),
+        atk: Math.floor(p.atk * (1 + buff.atk / 100)),
+        hp: Math.floor(p.hp * (1 + buff.hp / 100)),
+        currentHp: Math.floor(p.hp * (1 + buff.hp / 100)),
         ult: 0,
-        cool: 0 // ←これ
+        cool: 0
     };
 });
 }
@@ -835,7 +828,7 @@ loadData();
 update();
 
 function getTeamBuff(team){
-let atkBuff = 1;
+let atkBuff = 0;
 let hpBuff = 0;
 
 team.forEach(c=>{
