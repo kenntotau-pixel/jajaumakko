@@ -332,7 +332,7 @@ skill:{type:"damage", power:4.5, text:"450%ダメージ",cool:3}},
 {name:"アステレス",rarity:4,attr:"水",img:"https://imgur.com/XU6EFZa.png",
 skill:{type:"heal", power:0.7, text:"味方回復70%",cool:3}},
 {name:"バルナウス",rarity:4,attr:"火",img:"https://imgur.com/3mibLSW.png",
-skill:{type:"poison",power:0.75,text:"75%毒付与",cool:3}},
+skill:{type:"poison",power:1.5,text:"150%毒付与",cool:3}},
 
 {name:"ゲガント",rarity:1,attr:"木",img:"https://imgur.com/dXFpBIJ.png",
 skill:{text:"スキルなし"}},
@@ -440,7 +440,7 @@ if(exist.rarity===1){
 }else if(exist.rarity===3){
     atkUp=8; hpUp=20;
 }else if(exist.rarity===4){
-    atkUp=32; hpUp=80;
+    atkUp=128; hpUp=256;
 }
 exist.atk += atkUp;
 exist.hp += hpUp;
@@ -760,7 +760,8 @@ function enemyTurn(){
 // 💀 敵の毒
 if(enemy.poison && enemy.poison.turn > 0){
 
-    let dmg = enemy.poison.atk * enemy.poison.power;
+    let dmg = enemy.poison.user.atk * enemy.poison.power;
+
 
     enemy.hp -= dmg;
     enemy.poison.turn--;
@@ -834,7 +835,7 @@ loadData();
 update();
 
 function getTeamBuff(team){
-let atkBuff = 0;
+let atkBuff = 1;
 let hpBuff = 0;
 
 team.forEach(c=>{
@@ -908,7 +909,7 @@ if(s.type==="poison"){
     enemy.poison = {
         turn: 3,
         power: s.power,   // 何%
-        atk: p.atk        // 誰のATKか🔥
+        user: p        // 誰のATKか🔥
     };
 }
 
