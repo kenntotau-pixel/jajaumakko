@@ -857,17 +857,23 @@ if(!p.skill) return;
 
 let s = p.skill;
 
-// 🔥 ダメージ系
+// ★ これ追加
+let atk = p.atk;
+if(p.buff && p.buff.turn > 0){
+    atk *= p.buff.power;
+}
+
+// 🔥 ダメージ
 if(s.type==="damage"){
-    let res = calcDamage(p.attr, enemy.attr, p.atk * s.power);
+    let res = calcDamage(p.attr, enemy.attr, atk * s.power);
     enemy.hp -= res.dmg;
     showDamage("enemy", res);
 }
 
-// 🔥 多段攻撃
+// 🔥 多段
 if(s.type==="multi"){
     for(let i=0;i<s.hits;i++){
-        let res = calcDamage(p.attr, enemy.attr, p.atk * s.power);
+        let res = calcDamage(p.attr, enemy.attr, atk * s.power);
         enemy.hp -= res.dmg;
         showDamage("enemy", res);
     }
