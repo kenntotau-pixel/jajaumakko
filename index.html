@@ -313,7 +313,7 @@ skill:{type:"debuff", power:0.4, text:"敵弱体60%",cool:3}},
 skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}},
 
 {name:"弐呪刻",rarity:4,attr:"水",img:"https://imgur.com/qAGbxYV.png",
-skill:{type:"multi", power:0.4, hits:10, text:"10連撃+デバフ",cool:3}},
+skill:{type:"multi", power:0.4, hits:10, text:"10連撃+デバフ",cool:4}},
 {name:"黒瀬武人",rarity:3,attr:"火",img:"https://imgur.com/pgQHlal.png",
 skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
 {name:"フセイン",rarity:4,attr:"雷",img:"https://imgur.com/Yr0obwq.png",
@@ -877,6 +877,7 @@ if(s.type==="multi"){
         let res = calcDamage(p.attr, enemy.attr, atk * s.power);
         enemy.hp -= res.dmg;
         showDamage("enemy", res);
+        enemy.atk *= 0.9;
     }
 }
 
