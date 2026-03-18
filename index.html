@@ -756,6 +756,7 @@ players.forEach(p=>{
 });
 
 function enemyTurn(){
+
 // 💀 敵の毒
 if(enemy.poison && enemy.poison.turn > 0){
 
@@ -763,6 +764,12 @@ if(enemy.poison && enemy.poison.turn > 0){
 
     enemy.hp -= dmg;
     enemy.poison.turn--;
+
+    // 🔥 これを追加！！
+    if(enemy.hp <= 0){
+        win();
+        return;
+    }
 }
 
 // 💀 味方の毒
