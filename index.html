@@ -750,11 +750,14 @@ let lv=progress[i]||1;
 
 // 🔽ここ変更
 players = applyTeamBuff(team.map(c=>{
-    chars.find(ch => ch.name === c.name) ||
-    eventChars.find(ch => ch.name === c.name);
+    let base =
+        chars.find(ch => ch.name === c.name) ||
+        eventChars.find(ch => ch.name === c.name) ||
+        eventChars2.find(ch => ch.name === c.name); // ←これ追加🔥
+
     return {
         ...c,
-        skill: c.skill
+        skill: base?.skill || c.skill // ←安全にスキル取得
     };
 }));
 // 敵はそのまま
@@ -976,7 +979,9 @@ return {
 }
 
 function skill(){
-let p = players[turnIndex];
+let p = players[turnIndex];  // ←先にこれ！
+
+if(!p.skill || !p.skill.type) return;
 if(p.cool > 0) return;
 if(!p.skill) return;
 
