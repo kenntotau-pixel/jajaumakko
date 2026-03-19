@@ -178,7 +178,7 @@ to{filter:brightness(1.3);}
 }
 
 #gameTitle{
-  width: 400px;   /* 好きなサイズに変更 */
+  width: 350px;   /* 好きなサイズに変更 */
   height: auto;   /* 縦横比維持 */
 }
 
@@ -192,8 +192,10 @@ to{filter:brightness(1.3);}
 <button onclick="go('gacha')">ガチャ</button>
 <button onclick="go('party')">編成</button>
 <button onclick="go('trial')">試練</button>
-<button onclick="resetData()">データリセット</button>
+<button onclick="confirmReset()" style="opacity:0.6;font-size:12px;">
+データリセット
 </div>
+
 
 <div id="gacha" class="screen">
 石:<span id="stone"></span><br>
@@ -335,6 +337,9 @@ let stone=100;
 let box=[],team=[],players=[],enemy;
 let turn="player",turnIndex=0;
 let progress={};
+
+let trialPage = 0;
+const perPage = 8;
 
 const attrClass={火:"fire",水:"water",雷:"thunder",木:"wood"};
 const advantage={火:"木",木:"雷",雷:"水",水:"火"};
@@ -1392,6 +1397,56 @@ results.forEach((c,i)=>{
 
 update();
 saveData();
+}
+
+function confirmReset(){
+if(confirm("本当にデータを削除しますか？")){
+    resetData();
+}
+}
+
+function renderTrials(){
+
+let start = trialPage * perPage;
+let end = start + perPage;
+
+let list = chars.slice(start, end);
+
+trialList.innerHTML = list.map((c,i)=>{
+
+let index = start + i;
+let lv = progress[index] || 1;
+
+return `
+<div class="card ${attrClass[c.attr]}">
+<img src="${c.img}">
+${c.name}<br>
+Lv.${lv}
+<button onclick="startBattle(${index})">挑戦</button>
+</div>
+`;
+
+}).join("");
+
+// ページボタン
+trialList.innerHTML += `
+<div style="margin-top:10px;">
+<button onclick="changePage(-1)">＜</button>
+${trialPage+1}
+<button onclick="changePage(1)">＞</button>
+</div>
+`;
+}
+
+function changePage(dir){
+let maxPage = Math.ceil(chars.length / perPage);
+
+trialPage += dir;
+
+if(trialPage < 0) trialPage = 0;
+if(trialPage >= maxPage) trialPage = maxPage-1;
+
+renderTrials();
 }
 
 </script>
