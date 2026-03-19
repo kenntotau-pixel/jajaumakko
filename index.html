@@ -1059,6 +1059,17 @@ if(s.type==="hpCut"){
     showDamage("enemy",{dmg,type:""});
 }
 
+if(s.type==="double"){
+    let res = calcDamage(p.attr, enemy.attr, atk * s.power);
+    enemy.hp -= res.dmg;
+    showDamage("enemy", res);
+
+    // 追加攻撃
+    let res2 = calcDamage(p.attr, enemy.attr, atk * 0.5);
+    enemy.hp -= res2.dmg;
+    showDamage("enemy", res2);
+}
+
 endTurn();
 }
 
