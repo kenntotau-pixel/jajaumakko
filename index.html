@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>神ソシャゲ</title>
+<title>真剣のスルーメ</title>
 
 <style>
 body{margin:0;background:#0b0f1a;color:#fff;font-family:sans-serif}
@@ -153,13 +153,42 @@ animation:glow 1s infinite alternate;
 from{filter:brightness(1);}
 to{filter:brightness(1.6);}
 }
+
+.eventFlash{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:linear-gradient(135deg,#ff00cc,#3333ff,#00ffff);
+opacity:0.8;
+animation:eventFlash 0.8s forwards;
+z-index:999;
+}
+
+@keyframes eventFlash{
+0%{opacity:1;transform:scale(1);}
+100%{opacity:0;transform:scale(1.2);}
+}
+
+.banner{
+animation:bannerGlow 1.5s infinite alternate;
+}
+@keyframes bannerGlow{
+from{filter:brightness(1);}
+to{filter:brightness(1.3);}
+}
+
+#gameTitle{
+  width: 400px;   /* 好きなサイズに変更 */
+  height: auto;   /* 縦横比維持 */
+}
+
 </style>
 </head>
 
 <body>
 
 <div id="title" class="screen active">
-<h1>神ソシャゲ</h1>
+<h1><img src="https://imgur.com/5Olw81v.png" id="gameTitle"></h1>
 <button onclick="go('gacha')">ガチャ</button>
 <button onclick="go('party')">編成</button>
 <button onclick="go('trial')">試練</button>
@@ -168,8 +197,44 @@ to{filter:brightness(1.6);}
 
 <div id="gacha" class="screen">
 石:<span id="stone"></span><br>
+
+<!-- 🔥タブ -->
+<div style="display:flex;justify-content:center;margin:10px;">
+<button onclick="changeBanner(0)">通常</button>
+<button onclick="changeBanner(1)">イベント</button>
+</div>
+
+<!-- 🔥スライド -->
+<div style="overflow:hidden;width:100%;">
+<div id="bannerSlide" style="display:flex;transition:0.4s;">
+
+<!-- 通常ガチャ -->
+<div style="min-width:100%;">
+
+<img src="https://imgur.com/QTGUO26.png"
+class="banner"
+style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
+
+<br>
 <button onclick="draw1()">単発</button>
 <button onclick="draw10()">10連</button>
+</div>
+
+<!-- イベントガチャ -->
+<div style="min-width:100%;">
+
+<img src="https://imgur.com/S4GoGo7.png"
+class="banner"
+style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
+
+<br>
+<button onclick="drawEvent1()">イベント単発</button>
+<button onclick="drawEvent10()">イベント10連</button>
+</div>
+
+</div>
+</div>
+
 <div id="gachaResult"></div>
 <button onclick="go('title')">戻る</button>
 </div>
@@ -348,7 +413,25 @@ skill:{text:"スキルなし"}},
 {name:"マタイ",rarity:1,attr:"木",img:"https://imgur.com/wnIKk8n.png",
 skill:{text:"スキルなし"}},
 {name:"ログフ",rarity:1,attr:"火",img:"https://imgur.com/3sgyjeg.png",
-skill:{text:"スキルなし"}}
+skill:{text:"スキルなし"}},
+];
+const eventChars = [
+{name:"コード5.2🍖",rarity:4,attr:"雷",img:"https://imgur.com/IZIJSZf.png",
+skill:{type:"damage", power:4.5, text:"450%ダメージ",cool:3}},
+{name:"FqEa🍖",rarity:4,attr:"木",img:"https://imgur.com/zFwdenR.png",
+skill:{type:"drain", power:3.5, text:"350%ダメ+回復",cool:3}},
+{name:"甲斐翔也🍖",rarity:4,attr:"水",img:"https://imgur.com/58gYmEW.png",
+skill:{type:"poison", power:1.5, text:"150%毒付与",cool:3}},
+{name:"黒峰天音🍖",rarity:3,attr:"水",img:"https://imgur.com/VMUzNSc.png",
+skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
+{name:"晴海亨🍖",rarity:3,attr:"雷",img:"https://imgur.com/J84XBdt.png",
+skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
+{name:"赤羽悠真🍖",rarity:3,attr:"木",img:"https://imgur.com/kKDxDCn.png",
+skill:{type:"teamBuff",power:1.40,text:"全体atk上昇40%",cool:3}},
+{name:"桜木彰🍖",rarity:3,attr:"木",img:"https://imgur.com/LiyJN0d.png",
+skill:{type:"debuff", power:0.4, text:"敵弱体60%",cool:3}},
+{name:"八並解徒🍖",rarity:3,attr:"火",img:"https://imgur.com/M9sgpcX.png",
+skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}}
 ];
 
 function star(r){return "★".repeat(r);}
@@ -356,12 +439,15 @@ function star(r){return "★".repeat(r);}
 function getGachaChar(){
 let r=Math.random();
 let rarity;
+
 if(r < 0.70) rarity = 1;
 else if(r < 0.90) rarity = 2;
 else if(r < 0.99)rarity = 3;
 else rarity =4;
 
+// 🔥通常キャラだけ
 let pool = chars.filter(c=>c.rarity==rarity);
+
 return pool[Math.random()*pool.length|0];
 }
 
@@ -627,10 +713,11 @@ let lv=progress[i]||1;
 
 // 🔽ここ変更
 players = applyTeamBuff(team.map(c=>{
-    let base = chars.find(ch => ch.name === c.name);
+    chars.find(ch => ch.name === c.name) ||
+    eventChars.find(ch => ch.name === c.name);
     return {
         ...c,
-        skill: base?.skill // ←これ追加
+        skill: c.skill
     };
 }));
 // 敵はそのまま
@@ -865,6 +952,8 @@ if(p.buff && p.buff.turn > 0){
 }
 
 // 🔥 ダメージ
+
+
 if(s.type==="damage"){
     let res = calcDamage(p.attr, enemy.attr, atk * s.power);
     enemy.hp -= res.dmg;
@@ -920,7 +1009,245 @@ p.cool = s.cool || 2;
 
 // 👇最後にまとめて
 
+if(s.type==="drain"){
+    let res = calcDamage(p.attr, enemy.attr, atk * s.power);
+    enemy.hp -= res.dmg;
+
+    // 回復処理（与ダメの50%）
+    let heal = res.dmg * 0.5;
+    p.currentHp += heal;
+    if(p.currentHp > p.hp) p.currentHp = p.hp;
+
+    showDamage("enemy", res);
+}
+
 endTurn();
+}
+
+
+function drawEvent1(){
+if(stone < 10) return;
+stone -= 10;
+
+gachaResult.innerHTML="";
+
+// 演出
+let flash=document.createElement("div");
+flash.className="flash";
+document.body.appendChild(flash);
+setTimeout(()=>flash.remove(),600);
+
+// キャラ取得
+let c = getEventChar();
+
+if(c.rarity === 4){
+    playEventEffect();
+}
+
+// 表示
+let div=document.createElement("div");
+div.className=`card ${attrClass[c.attr]}`;
+div.innerHTML=`
+<div class="flip">
+<div class="front"></div>
+<div class="back ${c.rarity>=3?"ssr":""} ${c.rarity==4?"ultra":""}">
+<div class="rarity">${star(c.rarity)}</div>
+<img src="${c.img}">
+${c.name}
+</div>
+</div>`;
+gachaResult.appendChild(div);
+setTimeout(()=>div.classList.add("open"),50);
+
+// BOX処理
+let exist=box.find(b=>b.name===c.name);
+if(exist){
+    exist.dupe++;
+    let atkUp=0,hpUp=0;
+
+if(exist.rarity===1){
+    atkUp=2; hpUp=5;
+}else if(exist.rarity===2){
+    atkUp=4; hpUp=10;
+}else if(exist.rarity===3){
+    atkUp=8; hpUp=20;
+}else if(exist.rarity===4){
+    atkUp=64; hpUp=160;
+}
+
+exist.atk += atkUp;
+exist.hp += hpUp;
+}else{
+    box.push({...c,dupe:0,atk:20+5*c.rarity,hp:100+20*c.rarity});
+}
+
+update();
+saveData();
+}
+
+function drawEvent10(){
+if(stone < 100) return;
+stone -= 100;
+
+gachaResult.innerHTML="";
+
+for(let i=0;i<10;i++){
+    let c = getEventChar();
+
+if(c.rarity === 4){
+    playEventEffect();
+}
+
+    setTimeout(()=>{
+        let div=document.createElement("div");
+        div.className=`card ${attrClass[c.attr]}`;
+        div.innerHTML=`
+        <div class="flip">
+        <div class="front"></div>
+        <div class="back ${c.rarity>=3?"ssr":""} ${c.rarity==4?"ultra":""}">
+        <div class="rarity">${star(c.rarity)}</div>
+        <img src="${c.img}">
+        ${c.name}
+        </div>
+        </div>`;
+        gachaResult.appendChild(div);
+        setTimeout(()=>div.classList.add("open"),50);
+
+        let exist=box.find(b=>b.name===c.name);
+        if(exist){
+            exist.dupe++;
+            let atkUp=0,hpUp=0;
+
+if(exist.rarity===1){
+    atkUp=2; hpUp=5;
+}else if(exist.rarity===2){
+    atkUp=4; hpUp=10;
+}else if(exist.rarity===3){
+    atkUp=8; hpUp=20;
+}else if(exist.rarity===4){
+    atkUp=64; hpUp=160;
+}
+
+exist.atk += atkUp;
+exist.hp += hpUp;
+        }else{
+            box.push({...c,dupe:0,atk:20+5*c.rarity,hp:100+20*c.rarity});
+        }
+
+    },i*200);
+}
+
+update();
+saveData();
+}
+
+
+function showGachaResult(c){
+let div=document.createElement("div");
+div.className=`card ${attrClass[c.attr]}`;
+div.innerHTML=`
+<div class="flip">
+<div class="front"></div>
+<div class="back ${c.rarity>=3?"ssr":""}">
+<div class="rarity">${star(c.rarity)}</div>
+<img src="${c.img}">
+${c.name}
+</div>
+</div>`;
+gachaResult.appendChild(div);
+setTimeout(()=>div.classList.add("open"),50);
+}
+
+function addToBox(c){
+let exist = box.find(b=>b.name===c.name);
+
+if(exist){
+    exist.dupe++;
+
+    let atkUp=0,hpUp=0;
+    if(exist.rarity===1){atkUp=2;hpUp=5;}
+    else if(exist.rarity===2){atkUp=4;hpUp=10;}
+    else if(exist.rarity===3){atkUp=8;hpUp=20;}
+    else if(exist.rarity===4){atkUp=64;hpUp=160;}
+
+    exist.atk += atkUp;
+    exist.hp += hpUp;
+
+}else{
+    box.push({
+        name: c.name,
+        rarity: c.rarity,
+        attr: c.attr,
+        img: c.img,
+
+        // 🔥ここ超重要
+        skill: c.skill ? {
+            type: c.skill.type,
+            power: c.skill.power,
+            text: c.skill.text,
+            cool: c.skill.cool
+        } : {type:"none"},
+
+        dupe:0,
+        atk:20+5*c.rarity,
+        hp:100+20*c.rarity
+    });
+}
+}
+
+function changeBanner(i){
+let slide = document.getElementById("bannerSlide");
+if(!slide) return; // ←これ追加
+
+slide.style.transform = `translateX(-${i * 100}%)`;
+}
+
+function getEventChar(){
+let r = Math.random();
+let rarity;
+
+// 確率
+if(r < 0.70) rarity = 1;
+else if(r < 0.90) rarity = 2;
+else if(r < 0.99) rarity = 3;
+else rarity = 4;
+
+// ⭐☆4はイベント限定のみ
+if(rarity === 4){
+    let pool = eventChars.filter(c=>c.rarity === 4);
+
+    if(pool.length === 0){
+        console.warn("イベント☆4なし");
+        return getGachaChar();
+    }
+
+    return pool[Math.random()*pool.length|0];
+}
+
+// ☆3以下
+let pool = [
+...chars.filter(c=>c.rarity === rarity),
+...eventChars.filter(c=>c.rarity === rarity)
+];
+
+if(pool.length === 0){
+    return getGachaChar();
+}
+
+return pool[Math.random()*pool.length|0];
+}
+
+function playEventEffect(){
+
+let fx=document.createElement("div");
+fx.className="eventFlash";
+document.body.appendChild(fx);
+setTimeout(()=>fx.remove(),800);
+
+// 画面揺れ
+document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
+
 }
 
 </script>
