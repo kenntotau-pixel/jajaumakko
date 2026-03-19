@@ -202,6 +202,7 @@ to{filter:brightness(1.3);}
 <div style="display:flex;justify-content:center;margin:10px;">
 <button onclick="changeBanner(0)">通常</button>
 <button onclick="changeBanner(1)">イベント</button>
+<button onclick="changeBanner(2)">イベント2</button>
 </div>
 
 <!-- 🔥スライド -->
@@ -232,12 +233,27 @@ style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
 <button onclick="drawEvent10()">イベント10連</button>
 </div>
 
+<!-- イベントガチャ2 -->
+<div style="min-width:100%;">
+
+<img src="https://imgur.com/qANeyJ5.png"
+class="banner"
+style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
+
+<br>
+<button onclick="drawEvent2_1()">イベント単発</button>
+<button onclick="drawEvent2_10()">イベント10連</button>
+
+</div>
+
 </div>
 </div>
 
 <div id="gachaResult"></div>
 <button onclick="go('title')">戻る</button>
 </div>
+
+
 
 <div id="party" class="screen">
 <h2>編成</h2>
@@ -432,6 +448,22 @@ skill:{type:"teamBuff",power:1.40,text:"全体atk上昇40%",cool:3}},
 skill:{type:"debuff", power:0.4, text:"敵弱体60%",cool:3}},
 {name:"八並解徒🍖",rarity:3,attr:"火",img:"https://imgur.com/M9sgpcX.png",
 skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}}
+];
+const eventChars2 = [
+{name:"室井元武🌊",rarity:4,attr:"雷",img:"https://imgur.com/VLSNWxH.png",
+skill:{type:"multi", power:0.4, hits:10, text:"10連撃+デバフ",cool:4}},
+{name:"栗島トウヤ🌊",rarity:4,attr:"火",img:"https://imgur.com/8q3zZVK.png",
+skill:{type:"double", power:3.5, text:"350%追撃",cool:3}},
+{name:"死橋轟🌊",rarity:4,attr:"木",img:"https://imgur.com/QaZ0xFb.png",
+skill:{type:"hpCut", power:0.2, text:"20%HPカット",cool:3}},
+{name:"鈴鹿🌊",rarity:3,attr:"雷",img:"https://imgur.com/WNqWz7J.png",
+skill:{type:"drain", power:2, text:"200%ダメ+回復",cool:3}},
+{name:"沢華🌊",rarity:3,attr:"木",img:"https://imgur.com/NsV8dpn.png",
+skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
+{name:"阿波牛壬陸🌊",rarity:3,attr:"火",img:"https://imgur.com/Dcyb66m.png",
+skill:{type:"heal", power:0.5, text:"味方回復50%",cool:3}},
+{name:"湯照司吉基🌊",rarity:3,attr:"水",img:"https://imgur.com/BnL3yUh.png",
+skill:{type:"hpCut", power:0.1, text:"10%HPカット",cool:3}}
 ];
 
 function star(r){return "★".repeat(r);}
@@ -1021,6 +1053,12 @@ if(s.type==="drain"){
     showDamage("enemy", res);
 }
 
+if(s.type==="hpCut"){
+    let dmg = enemy.maxHp * s.power;
+    enemy.hp -= dmg;
+    showDamage("enemy",{dmg,type:""});
+}
+
 endTurn();
 }
 
@@ -1264,6 +1302,85 @@ setTimeout(()=>fx.remove(),800);
 document.body.classList.add("shake");
 setTimeout(()=>document.body.classList.remove("shake"),400);
 
+}
+
+function getEventChar2(){
+let r = Math.random();
+let rarity;
+
+if(r < 0.70) rarity = 1;
+else if(r < 0.90) rarity = 2;
+else if(r < 0.99) rarity = 3;
+else rarity = 4;
+
+// ☆4はイベント2限定
+if(rarity === 4){
+    let pool = eventChars2.filter(c=>c.rarity === 4);
+    if(pool.length === 0) return getGachaChar();
+    return pool[Math.random()*pool.length|0];
+}
+
+// ☆3以下
+let pool = [
+...chars.filter(c=>c.rarity === rarity),
+...eventChars2.filter(c=>c.rarity === rarity)
+];
+
+if(pool.length === 0) return getGachaChar();
+
+return pool[Math.random()*pool.length|0];
+}
+
+function drawEvent2_1(){
+if(stone < 10) return;
+stone -= 10;
+
+gachaResult.innerHTML="";
+
+let c = getEventChar2();
+
+if(c.rarity === 4){
+    playEventEffect();
+}
+
+showGachaResult(c);
+addToBox(c);
+
+update();
+saveData();
+}
+
+function drawEvent2_10(){
+if(stone < 100) return;
+stone -= 100;
+
+gachaResult.innerHTML="";
+
+let results = [];
+
+for(let i=0;i<9;i++){
+    results.push(getEventChar2());
+}
+
+// ☆3確定
+let pool = eventChars2.filter(c=>c.rarity===3);
+if(pool.length===0) pool = chars.filter(c=>c.rarity===3);
+
+results.push(pool[Math.random()*pool.length|0]);
+
+results.forEach((c,i)=>{
+    if(c.rarity === 4){
+        playEventEffect();
+    }
+
+    setTimeout(()=>{
+        showGachaResult(c);
+        addToBox(c);
+    },i*200);
+});
+
+update();
+saveData();
 }
 
 </script>
