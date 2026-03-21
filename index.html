@@ -192,6 +192,7 @@ to{filter:brightness(1.3);}
 <button onclick="go('gacha')">ガチャ</button>
 <button onclick="go('party')">編成</button>
 <button onclick="go('trial')">試練</button>
+<button onclick="go('event')">イベントの間</button>
 <button onclick="confirmReset()" style="opacity:0.6;font-size:12px;">
 データリセット
 </div>
@@ -205,6 +206,7 @@ to{filter:brightness(1.3);}
 <button onclick="changeBanner(0)">通常</button>
 <button onclick="changeBanner(1)">イベント</button>
 <button onclick="changeBanner(2)">イベント2</button>
+<button onclick="changeBanner(3)">イベント3</button>
 </div>
 
 凸塊:<span id="dupeStone"></span><br>
@@ -250,11 +252,25 @@ style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
 
 </div>
 
+<div style="min-width:100%;">
+
+<img src="https://imgur.com/yBeTnrB.png"
+class="banner"
+style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
+
+<br>
+<button onclick="drawEvent3_1()">イベント単発</button>
+<button onclick="drawEvent3_10()">イベント10連</button>
+
+</div>
+
 </div>
 </div>
 
 <div id="gachaResult"></div>
-<button onclick="go('title')">戻る</button>
+<button onclick="go('title')" style="margin-top:30px;">
+戻る
+</button>
 </div>
 
 
@@ -286,8 +302,12 @@ style="width:90%;max-width:400px;border-radius:12px;margin-bottom:10px;">
 <h2>試練</h2>
 <div id="trialList"></div>
 <button onclick="go('title')">戻る</button>
+</div>
 
-
+<div id="event" class="screen">
+<h2>イベントの間</h2>
+<div id="eventList"></div>
+<button onclick="go('title')">戻る</button>
 </div>
 
 <div id="battle" class="screen">
@@ -321,7 +341,8 @@ stone,
 box,
 team,
 progress,
-dupeStone
+dupeStone,
+eventProgress // ←追加
 };
 localStorage.setItem("gachaData", JSON.stringify(data));
 }
@@ -334,7 +355,8 @@ stone = data.stone ?? 100;
 box = data.box ?? [];
 team = data.team ?? [];
 progress = data.progress ?? {};
-dupeStone = data.dupeStone ?? 0; // ←これ追加！！
+dupeStone = data.dupeStone ?? 0;
+eventProgress = data.eventProgress ?? {};
 
 }
 
@@ -343,6 +365,9 @@ let box=[],team=[],players=[],enemy;
 let turn="player",turnIndex=0;
 let progress={};
 let dupeStone = 0; // 凸塊
+let currentEvent = undefined; // ←これ追加🔥
+
+let eventProgress = {};
 
 let trialPage = 0;
 const perPage = 8;
@@ -476,6 +501,100 @@ skill:{type:"heal", power:0.5, text:"味方回復50%",cool:3}},
 {name:"湯照司吉基🌊",rarity:3,attr:"水",img:"https://imgur.com/BnL3yUh.png",
 skill:{type:"hpCut", power:0.1, text:"10%HPカット",cool:3}}
 ];
+const eventChars3 = [
+{name:"玉垣剣城🃏",rarity:4,attr:"雷",img:"https://imgur.com/wWZMYh9.png",
+skill:{type:"buff", power:1.5, text:"150%バフ",cool:2}},
+{name:"蒼井朔也🃏",rarity:4,attr:"木",img:"https://imgur.com/sNKzJGl.png",
+skill:{type:"counter",power:2,turn:3,text:"反撃200%ダメ",cool:4}},
+{name:"石倉有栖🃏",rarity:3,attr:"火",img:"https://imgur.com/c5F39ns.png",
+skill:{type:"shield",power:0.2,turn:3,text:"被ダメ20%軽減", cool:4}},
+{name:"ミニモータ🃏",rarity:3,attr:"水",img:"https://imgur.com/ye1eRxh.png",
+skill:{type:"damage", power:3, text:"300%ダメージ",cool:4}},
+{name:"ソーメーン🃏",rarity:3,attr:"木",img:"https://imgur.com/9Y7vMep.png",
+skill:{type:"multi", power:0.4, hits:4, text:"4連撃+デバフ",cool:3}},
+{name:"跳田収滋🃏",rarity:4,attr:"火",img:"https://imgur.com/RfgOSpA.png",
+skill:{type:"shield",power:0.5,turn:3,text:"被ダメ50%軽減", cool:4}},
+{name:"オリバー🃏",rarity:3,attr:"雷",img:"https://imgur.com/RUYzfxo.png",
+skill:{type:"buff", power:1.2, text:"120%バフ",cool:2}}
+];
+
+const eventStages = [
+{
+    name:"OGの試練",
+    stages:[
+        {lv:1, hp:500, atk:50},
+        {lv:2, hp:1000, atk:100},
+        {lv:3, hp:2000, atk:200},
+        {lv:4, hp:6000, atk:600},
+        {lv:5, hp:18000, atk:1800},
+        {lv:"BOSS", hp:54000, atk:3600, boss:true}
+    ],
+    enemy:{
+        name:"和辺重信🍖",
+        attr:"火",
+        img:"https://imgur.com/dgKm097.png"
+    },
+    reward:50,
+    bossReward:500,    // ←追加🔥
+rewardChar:{
+    name:"和辺重信🍖",
+    rarity:3,
+    attr:"火",
+    img:"https://imgur.com/dgKm097.png",
+    skill:{type:"counter",power:1.0,turn:3,text:"反撃100%ダメ",cool:4}
+}
+},
+{
+    name:"海辺の試練",
+    stages:[
+        {lv:1, hp:500, atk:50},
+        {lv:2, hp:1000, atk:100},
+        {lv:3, hp:2000, atk:200},
+        {lv:4, hp:6000, atk:600},
+        {lv:5, hp:18000, atk:1800},
+        {lv:"BOSS", hp:54000, atk:3600, boss:true}
+    ],
+    enemy:{
+        name:"珠濃雅紀🌊",
+        attr:"水",
+        img:"https://imgur.com/raQuv6H.png"
+    },
+    reward:50,
+    bossReward:500,    // ←追加🔥
+rewardChar:{
+    name:"珠濃雅紀🌊",
+    rarity:3,
+    attr:"水",
+    img:"https://imgur.com/raQuv6H.png",
+    skill:{type:"double", power:2, text:"200%追撃",cool:3}
+}
+},
+{
+    name:"賭場の試練",
+    stages:[
+        {lv:1, hp:500, atk:50},
+        {lv:2, hp:1000, atk:100},
+        {lv:3, hp:2000, atk:200},
+        {lv:4, hp:6000, atk:600},
+        {lv:5, hp:18000, atk:1800},
+        {lv:"BOSS", hp:54000, atk:3600, boss:true}
+    ],
+    enemy:{
+        name:"弐呪刻🃏",
+        attr:"雷",
+        img:"https://imgur.com/0GAe9qU.png"
+    },
+    reward:50,
+    bossReward:500,    // ←追加🔥
+rewardChar:{
+    name:"弐呪刻",
+    rarity:3,
+    attr:"雷",
+    img:"https://imgur.com/0GAe9qU.png",
+    skill:{type:"double", power:2, text:"200%追撃",cool:3}
+}
+}
+];
 
 function star(r){return "★".repeat(r);}
 
@@ -499,6 +618,7 @@ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 update();
 if(id==="trial")renderTrials();
+if(id==="event") renderEvent(); // ←追加
 }
 function draw1(){
 if(stone < 10) return;
@@ -788,10 +908,11 @@ let lv=progress[i]||1;
 
 // 🔽ここ変更
 players = applyTeamBuff(team.map(c=>{
-    let base =
-        chars.find(ch => ch.name === c.name) ||
-        eventChars.find(ch => ch.name === c.name) ||
-        eventChars2.find(ch => ch.name === c.name); // ←これ追加🔥
+let base =
+    chars.find(ch => ch.name === c.name) ||
+    eventChars.find(ch => ch.name === c.name) ||
+    eventChars2.find(ch => ch.name === c.name) ||
+    eventChars3.find(ch => ch.name === c.name); // ←これ追加🔥
 
     return {
         ...c,
@@ -804,7 +925,8 @@ enemy={
     hp:200+lv*80,
     maxHp:200+lv*80, // ←ここ追加🔥
     atk:20+lv*10,
-    poison:0
+    poison:0,
+    debuffUsed:false // ←追加
 };
 
 turn="player";turnIndex=0;
@@ -820,6 +942,8 @@ return {dmg:base,type:""};
 function showDamage(id,res){
 let el=document.getElementById(id);
 
+if(!el) return; // ←これ追加（超重要）
+
 let div=document.createElement("div");
 div.className="damage";
 
@@ -827,15 +951,18 @@ let color="#fff";
 if(res.type==="weak") color="#ff4444";
 if(res.type==="resist") color="#44aaff";
 
-div.innerHTML=`
-<span style="color:${color}">
-${Math.floor(res.dmg)}
-</span><br>
-<span class="${res.type}">${res.type.toUpperCase()}</span>
-`;
+div.textContent = Math.floor(res.dmg);
+div.style.color = color;
 
 el.appendChild(div);
+
 setTimeout(()=>div.remove(),900);
+
+if(!el){
+    renderBattle();
+    el=document.getElementById(id);
+    if(!el) return;
+}
 }
 
 function renderBattle(){
@@ -881,6 +1008,7 @@ if(p.buff && p.buff.turn > 0){
 let res=calcDamage(p.attr,enemy.attr,atk);
 enemy.hp-=res.dmg;
 
+renderBattle(); // ←追加
 p.ult+=30;
 showDamage("enemy",res);
 endTurn();
@@ -915,6 +1043,16 @@ players.forEach(p=>{
 
 function enemyTurn(){
 
+let target = players[Math.floor(Math.random() * players.length)];
+
+let res = calcDamage(enemy.attr, target.attr, enemy.atk);
+if(target.shield && target.shield.turn > 0){
+    res.dmg *= (1 - target.shield.power);
+}
+target.currentHp -= res.dmg;
+
+showDamage("p" + players.indexOf(target), res);
+
 // 💀 敵の毒
 if(enemy.poison && enemy.poison.turn > 0){
 
@@ -938,19 +1076,45 @@ players.forEach(p=>{
         p.poison--;
     }
 });
-let t=players[Math.random()*players.length|0];
-let res=calcDamage(enemy.attr,t.attr,enemy.atk);
-t.currentHp-=res.dmg;
-showDamage("p"+players.indexOf(t),res);
 
+
+
+// 反撃処理（全員チェック）
+players.forEach(t=>{
+    if(t.counter && t.counter.turn > 0){
+        let res2 = calcDamage(t.attr, enemy.attr, t.atk * t.counter.power);
+        enemy.hp -= res2.dmg;
+        showDamage("enemy", res2);
+
+        t.counter.turn--;
+if(enemy.hp <= 0){
+    win();
+    return;
+}
+    }
+});
 
 
 players=players.filter(p=>p.currentHp>0);
 if(players.length===0){
-alert("敗北");
-go("trial"); // ←追加
-return;
+    alert("敗北");
+
+    if(currentEvent !== undefined){
+        currentEvent = undefined; // 念のためリセット
+        go("event"); // ←イベントに戻る
+    }else{
+        go("trial"); // ←通常時だけ試練
+    }
+
+    return;
 }
+
+// シールドのターン減少
+players.forEach(p=>{
+    if(p.shield && p.shield.turn > 0){
+        p.shield.turn--;
+    }
+});
 
 turn="player";turnIndex=0;
 renderBattle();
@@ -962,6 +1126,9 @@ players.forEach(p=>{
 
 function endTurn(){
 let p = players[turnIndex];
+
+
+
 if(p.cool > 0) p.cool--;
 
 if(enemy.hp<=0)return win();
@@ -976,12 +1143,20 @@ renderBattle();
 }
 
 function win(){
-stone+=50;
-let id=chars.findIndex(c=>c.name===enemy.name);
-progress[id]=(progress[id]||1)+1;
-saveData();
-alert("勝利！石+50");
-go("trial");
+
+    // ⭐ イベント中ならイベント処理
+    if(currentEvent !== undefined){
+        Eventwin();
+        return;
+    }
+
+    // ⭐ 通常の試練
+    stone+=50;
+    let id=chars.findIndex(c=>c.name===enemy.name);
+    progress[id]=(progress[id]||1)+1;
+    saveData();
+    alert("勝利！石+50");
+    go("trial");
 }
 
 function resetData(){
@@ -1046,7 +1221,13 @@ if(s.type==="multi"){
         let res = calcDamage(p.attr, enemy.attr, atk * s.power);
         enemy.hp -= res.dmg;
         showDamage("enemy", res);
-        enemy.atk *= 0.9;
+        let debuff = 0.9;
+
+if(currentEvent !== undefined){
+    debuff = 1 - (1 - 0.9) * 0.5;
+}
+
+enemy.atk *= debuff;
     }
 }
 
@@ -1065,7 +1246,14 @@ if(s.type==="buff"){
 
 // 🔻 デバフ
 if(s.type==="debuff"){
-    enemy.atk *= s.power;
+
+    // 🔥すでにデバフ済みなら無効
+    if(enemy.debuffUsed){
+        alert("これ以上弱体化できない！");
+    }else{
+        enemy.atk *= s.power;
+        enemy.debuffUsed = true; // ←フラグ
+    }
 }
 
 if(s.type==="poison"){
@@ -1085,9 +1273,15 @@ if(s.type==="teamBuff"){
     });
 }
 
-p.cool = s.cool || 2;
+if(s.type==="counter"){
+    p.counter = {
+        turn: s.turn,
+        power: s.power
+    };
+}
 
-// 👇最後にまとめて
+
+p.cool = s.cool || 2;
 
 if(s.type==="drain"){
     let res = calcDamage(p.attr, enemy.attr, atk * s.power);
@@ -1118,9 +1312,15 @@ if(s.type==="double"){
     showDamage("enemy", res2);
 }
 
-endTurn();
+if(s.type==="shield"){
+    p.shield = {
+        turn: s.turn,
+        power: s.power
+    };
 }
 
+endTurn();
+}
 
 function drawEvent1(){
 if(stone < 10) return;
@@ -1447,6 +1647,33 @@ if(pool.length === 0) return getGachaChar();
 return pool[Math.random()*pool.length|0];
 }
 
+function getEventChar3(){
+let r = Math.random();
+let rarity;
+
+if(r < 0.70) rarity = 1;
+else if(r < 0.90) rarity = 2;
+else if(r < 0.99) rarity = 3;
+else rarity = 4;
+
+// ☆4はイベント3限定
+if(rarity === 4){
+    let pool = eventChars3.filter(c=>c.rarity === 4);
+    if(pool.length === 0) return getGachaChar();
+    return pool[Math.random()*pool.length|0];
+}
+
+// ☆3以下
+let pool = [
+...chars.filter(c=>c.rarity === rarity),
+...eventChars3.filter(c=>c.rarity === rarity)
+];
+
+if(pool.length === 0) return getGachaChar();
+
+return pool[Math.random()*pool.length|0];
+}
+
 function drawEvent2_1(){
 if(stone < 10) return;
 stone -= 10;
@@ -1559,10 +1786,10 @@ function useDupe(i){
 
     let cost = 0;
 
-    if(c.rarity === 1) cost = 1;
-    if(c.rarity === 2) cost = 3;
-    if(c.rarity === 3) cost = 10;
-    if(c.rarity === 4) cost = 30;
+    if(c.rarity === 1) cost = 5;
+    if(c.rarity === 2) cost = 10;
+    if(c.rarity === 3) cost = 30;
+    if(c.rarity === 4) cost = 100;
 
     if(dupeStone < cost){
         alert("凸塊が足りない");
@@ -1589,6 +1816,178 @@ function useDupe(i){
 
     update();
     saveData();
+}
+
+function drawEvent3_1(){
+if(stone < 10) return;
+stone -= 10;
+
+gachaResult.innerHTML="";
+
+let c = getEventChar3();
+
+if(c.rarity === 4){
+    playEventEffect();
+}
+
+showGachaResult(c);
+addToBox(c);
+
+update();
+saveData();
+}
+
+function drawEvent3_10(){
+if(stone < 100) return;
+stone -= 100;
+
+gachaResult.innerHTML="";
+
+let results = [];
+
+for(let i=0;i<9;i++){
+    results.push(getEventChar3());
+}
+
+// ☆3確定
+let pool = eventChars3.filter(c=>c.rarity===3);
+if(pool.length===0) pool = chars.filter(c=>c.rarity===3);
+
+results.push(pool[Math.random()*pool.length|0]);
+
+results.forEach((c,i)=>{
+    if(c.rarity === 4){
+        playEventEffect();
+    }
+
+    setTimeout(()=>{
+        showGachaResult(c);
+        addToBox(c);
+    },i*200);
+});
+
+update();
+saveData();
+}
+
+function renderEvent(){
+
+eventList.innerHTML = eventStages.map((e,i)=>{
+
+let prog = eventProgress[i] || 1;
+
+return `
+<div class="card">
+${e.name}<br>
+現在: Lv.${prog}
+<button onclick="startEventBattle(${i})">
+挑戦
+</button>
+</div>
+`;
+
+}).join("");
+}
+
+function startEventBattle(i){
+go("battle");
+
+let e = eventStages[i];
+let prog = eventProgress[i] || 1;
+
+// ステージ取得
+let stage = e.stages[prog-1];
+
+// 味方
+players = applyTeamBuff(team.map(c=>{
+let base =
+    chars.find(ch => ch.name === c.name) ||
+    eventChars.find(ch => ch.name === c.name) ||
+    eventChars2.find(ch => ch.name === c.name) ||
+    eventChars3.find(ch => ch.name === c.name); // 🔥追加
+
+    return {
+        ...c,
+        skill: base?.skill || c.skill
+    };
+}));
+
+// 敵
+enemy = {
+    ...e.enemy,
+    hp: stage.hp,
+    maxHp: stage.hp,
+    atk: stage.atk,
+    poison:0,
+    debuffUsed:false // ←追加
+};
+
+// ボス演出（任意）
+if(stage.boss){
+    alert("⚠️ボス出現！！");
+}
+
+turn="player";
+turnIndex=0;
+
+currentEvent = i;
+
+renderBattle();
+}
+
+function Eventwin(){
+
+if(currentEvent !== undefined){
+
+    let prog = eventProgress[currentEvent] || 1;
+    let e = eventStages[currentEvent];
+
+    // 🔥 初回クリア判定
+    if(!eventProgress["clear_"+currentEvent]){
+
+        // ★毎回報酬 → 初回だけに変更
+        stone += e.reward;
+
+    }
+
+    prog++;
+
+    if(prog > e.stages.length){
+
+        alert("🎉イベント完全制覇！");
+
+        // 🔥 初回のみ
+        if(!eventProgress["clear_"+currentEvent]){
+
+            // ボス報酬
+            stone += e.bossReward || 0;
+
+            // キャラ報酬
+            let rewardChar = e.rewardChar;
+            if(rewardChar){
+                addToBox(rewardChar);
+                alert("新キャラGET！！「" + rewardChar.name + "」");
+            }
+
+            // クリアフラグ
+            eventProgress["clear_"+currentEvent] = true;
+        }
+
+        prog = e.stages.length;
+
+    }else{
+        alert("ステージクリア！");
+    }
+
+    eventProgress[currentEvent] = prog;
+
+    saveData();
+
+    currentEvent = undefined;
+
+    go("event");
+    return;
+}
 }
 
 </script>
