@@ -360,7 +360,7 @@ eventProgress = data.eventProgress ?? {};
 
 }
 
-let stone=100;
+let stone=100000;
 let box=[],team=[],players=[],enemy;
 let turn="player",turnIndex=0;
 let progress={};
@@ -385,7 +385,7 @@ skill:{text:"スキルなし"}},
 {name:"死橋轟",rarity:1,attr:"雷",img:"https://imgur.com/tvliiOf.png",
 skill:{text:"スキルなし"}},
 {name:"沢華",rarity:2,attr:"水",img:"https://imgur.com/DQT7uSa.png",
-skill:{type:"debuff", power:0.6, text:"敵弱体40%",cool:3}},
+skill:{type:"debuff", power:0.8, text:"敵弱体20%",cool:3}},
 {name:"阿波牛壬陸",rarity:2,attr:"木",img:"https://imgur.com/FBI0zPO.png",
  skill:{type:"damage", power:1.5, text:"150%ダメージ",cool:3}},
 {name:"阿波牛星夜",rarity:3,attr:"水",img:"https://imgur.com/OcMPZTg.png",
@@ -404,7 +404,7 @@ skill:{type:"heal", power:0.3, text:"味方回復30%",cool:3}},
 {name:"黒峰天音",rarity:3,attr:"火",img:"https://imgur.com/76908qZ.png",
 skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
 {name:"晴海亭",rarity:2,attr:"木",img:"https://imgur.com/yVckkYt.png",
-skill:{type:"debuff", power:0.6, text:"敵弱体40%",cool:3}},
+skill:{type:"debuff", power:0.8, text:"敵弱体20%",cool:3}},
 {name:"甲斐翔也",rarity:3,attr:"木",img:"https://imgur.com/BrNyp9Z.png",
 skill:{type:"multi", power:0.7, hits:3, text:"3連撃+デバフ",cool:3}},
 {name:"赤羽悠真",rarity:2,attr:"雷",img:"https://imgur.com/7bxMy83.png",
@@ -412,7 +412,7 @@ skill:{type:"heal", power:0.4, text:"味方回復40%",cool:3}},
 {name:"桜木彰",rarity:2,attr:"火",img:"https://imgur.com/PqQS7xN.png",
 skill:{type:"heal", power:0.3, text:"味方回復30%",cool:3}},
 {name:"八並解徒",rarity:2,attr:"木",img:"https://imgur.com/S58UnRP.png",
-skill:{type:"debuff", power:0.6, text:"敵弱体40%",cool:3}},
+skill:{type:"debuff", power:0.8, text:"敵弱体20%",cool:3}},
 
 {name:"玉垣剣城",rarity:3,attr:"雷",img:"https://imgur.com/D0PXU4L.png",
 skill:{type:"damage", power:2, text:"200%ダメージ",cool:2}},
@@ -425,7 +425,7 @@ skill:{type:"multi", power:0.4, hits:4, text:"4連撃+デバフ",cool:3}},
 {name:"ソーメーン",rarity:3,attr:"雷",img:"https://imgur.com/dGE9dXV.png",
 skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}},
 {name:"跳田収滋",rarity:3,attr:"水",img:"https://imgur.com/Bw5qyja.png",
-skill:{type:"debuff", power:0.4, text:"敵弱体60%",cool:3}},
+skill:{type:"debuff", power:0.30, text:"敵弱体30%",cool:3}},
 {name:"オリバー",rarity:3,attr:"水",img:"https://imgur.com/57Rlf7D.png",
 skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}},
 
@@ -434,7 +434,7 @@ skill:{type:"multi", power:0.4, hits:10, text:"10連撃+デバフ",cool:4}},
 {name:"黒瀬武人",rarity:3,attr:"火",img:"https://imgur.com/pgQHlal.png",
 skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
 {name:"フセイン",rarity:4,attr:"雷",img:"https://imgur.com/Yr0obwq.png",
-skill:{type:"debuff", power:0.25, text:"敵弱体75%",cool:4}},
+skill:{type:"debuff", power:0.5, text:"敵弱体50%",cool:4}},
 {name:"リボルト",rarity:4,attr:"木",img:"https://imgur.com/RSHrI9C.png",
 skill:{type:"teamBuff",power:1.6,text:"全体atk上昇60%",cool:3}},
 {name:"死橋凪",rarity:4,attr:"火",img:"https://imgur.com/Wofj47Z.png",
@@ -481,7 +481,7 @@ skill:{type:"damage", power:2.5, text:"250%ダメージ",cool:3}},
 {name:"赤羽悠真🍖",rarity:3,attr:"木",img:"https://imgur.com/kKDxDCn.png",
 skill:{type:"teamBuff",power:1.40,text:"全体atk上昇40%",cool:3}},
 {name:"桜木彰🍖",rarity:3,attr:"木",img:"https://imgur.com/LiyJN0d.png",
-skill:{type:"debuff", power:0.4, text:"敵弱体60%",cool:3}},
+skill:{type:"debuff", power:0.7, text:"敵弱体30%",cool:3}},
 {name:"八並解徒🍖",rarity:3,attr:"火",img:"https://imgur.com/M9sgpcX.png",
 skill:{type:"poison",power:0.5,text:"50%毒付与",cool:3}}
 ];
@@ -555,14 +555,14 @@ rewardChar:{
         {lv:"BOSS", hp:54000, atk:3600, boss:true}
     ],
     enemy:{
-        name:"珠濃雅紀🌊",
+        name:"明石啓希🌊",
         attr:"水",
         img:"https://imgur.com/raQuv6H.png"
     },
     reward:50,
     bossReward:500,    // ←追加🔥
 rewardChar:{
-    name:"珠濃雅紀🌊",
+    name:"明石啓希🌊",
     rarity:3,
     attr:"水",
     img:"https://imgur.com/raQuv6H.png",
@@ -1221,10 +1221,10 @@ if(s.type==="multi"){
         let res = calcDamage(p.attr, enemy.attr, atk * s.power);
         enemy.hp -= res.dmg;
         showDamage("enemy", res);
-        let debuff = 0.9;
+        let debuff = 0.95;
 
 if(currentEvent !== undefined){
-    debuff = 1 - (1 - 0.9) * 0.5;
+    debuff = 1 - (1 - 0.95) * 0.5;
 }
 
 enemy.atk *= debuff;
@@ -1246,6 +1246,9 @@ if(s.type==="buff"){
 
 // 🔻 デバフ
 if(s.type==="debuff"){
+if(currentEvent !== undefined){
+    s.power = 1 - (1 - s.power) * 0.5;
+}
 
     // 🔥すでにデバフ済みなら無効
     if(enemy.debuffUsed){
