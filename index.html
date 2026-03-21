@@ -360,7 +360,7 @@ eventProgress = data.eventProgress ?? {};
 
 }
 
-let stone=100;
+let stone=100000;
 let box=[],team=[],players=[],enemy;
 let turn="player",turnIndex=0;
 let progress={};
@@ -587,11 +587,11 @@ rewardChar:{
     reward:50,
     bossReward:500,    // ←追加🔥
 rewardChar:{
-    name:"弐呪刻",
+    name:"弐呪刻🃏",
     rarity:3,
     attr:"雷",
     img:"https://imgur.com/0GAe9qU.png",
-    skill:{type:"double", power:2, text:"200%追撃",cool:3}
+    skill:{type:"shield",power:0.2,turn:3,text:"被ダメ20%軽減", cool:4}
 }
 }
 ];
@@ -1338,6 +1338,7 @@ setTimeout(()=>flash.remove(),600);
 let c = getEventChar();
 
 if(c.rarity === 4){
+    playSSRLight();
     playEventEffect();
 }
 
@@ -1428,6 +1429,7 @@ results.push(highPool[Math.random()*highPool.length|0]);
 results.forEach((c,i)=>{
 
     if(c.rarity === 4){
+        playSSRLight();
         playEventEffect();
     }
 
@@ -1498,7 +1500,7 @@ div.className=`card ${attrClass[c.attr]}`;
 div.innerHTML=`
 <div class="flip">
 <div class="front"></div>
-<div class="back ${c.rarity>=3?"ssr":""}">
+<div class="back ${c.rarity==3?"ssr":""} ${c.rarity==4?"ultra":""}">
 <div class="rarity">${star(c.rarity)}</div>
 <img src="${c.img}">
 ${c.name}
@@ -1683,6 +1685,7 @@ gachaResult.innerHTML="";
 let c = getEventChar2();
 
 if(c.rarity === 4){
+    playSSRLight();
     playEventEffect();
 }
 
@@ -1713,6 +1716,7 @@ results.push(pool[Math.random()*pool.length|0]);
 
 results.forEach((c,i)=>{
     if(c.rarity === 4){
+    playSSRLight();
         playEventEffect();
     }
 
@@ -1827,6 +1831,7 @@ gachaResult.innerHTML="";
 let c = getEventChar3();
 
 if(c.rarity === 4){
+    playSSRLight();
     playEventEffect();
 }
 
@@ -1857,6 +1862,7 @@ results.push(pool[Math.random()*pool.length|0]);
 
 results.forEach((c,i)=>{
     if(c.rarity === 4){
+    playSSRLight();
         playEventEffect();
     }
 
@@ -1988,6 +1994,18 @@ if(currentEvent !== undefined){
     go("event");
     return;
 }
+}
+
+function playSSRLight(){
+
+let rainbow=document.createElement("div");
+rainbow.className="rainbowFlash";
+document.body.appendChild(rainbow);
+setTimeout(()=>rainbow.remove(),800);
+
+document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
+
 }
 
 </script>
