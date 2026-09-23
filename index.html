@@ -152,6 +152,36 @@
     opacity: 0.65; padding: 0 2px 2px;
   }
 
+  .action-banner{position:fixed;left:50%;top:calc(10px + var(--safe-t));transform:translate(-50%,-16px) scale(.94);z-index:120;min-width:min(94vw,520px);max-width:94vw;padding:15px 20px;border-radius:18px;background:linear-gradient(180deg,#332416,#160e08);border:3px solid var(--gold);box-shadow:0 10px 34px rgba(0,0,0,.68),0 0 34px rgba(227,164,55,.34);color:#fff;text-align:center;font-size:1.02rem;font-weight:900;line-height:1.5;opacity:0;pointer-events:none;transition:.22s ease;white-space:pre-line;letter-spacing:.02em}
+  .action-banner.show{opacity:1;transform:translate(-50%,0) scale(1)}
+  .action-banner.spell{border-color:#c58af0;box-shadow:0 10px 34px rgba(0,0,0,.68),0 0 34px rgba(123,79,174,.6)}
+  .action-banner.opponent{border-color:#ffb52e;background:linear-gradient(180deg,#4a2418,#1b0b08);box-shadow:0 10px 38px rgba(0,0,0,.72),0 0 38px rgba(255,105,55,.48)}
+  .action-banner.opponent.spell{border-color:#d49aff;box-shadow:0 10px 38px rgba(0,0,0,.72),0 0 38px rgba(157,82,220,.62)}
+  .action-banner.opponent::before{content:"相手のカード使用";display:block;font-size:.68rem;color:#ffd27a;letter-spacing:.12em;margin-bottom:2px}
+  .action-banner.attack{border-color:#ff7043;box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 26px rgba(255,112,67,.35)}
+  #actionCardPreview{display:none !important}
+  .mana-view-btn{font-family:inherit;font-size:.58rem;font-weight:900;border:1px solid var(--board-line);background:rgba(255,255,255,.07);color:var(--paper-2);border-radius:999px;padding:4px 7px;cursor:pointer;white-space:nowrap}
+  .mana-view-btn:active{transform:translateY(1px)}
+  
+  .sacrifice-active{box-shadow:0 0 0 3px #e35d38,0 0 16px rgba(227,93,56,.5)!important;transform:translateY(-3px)}
+  .sacrifice-selected{box-shadow:0 0 0 4px #ffd54a,0 0 22px rgba(255,190,45,.72)!important;transform:translateY(-5px) scale(1.03)!important}
+  .sacrifice-selected::after{content:"✓ 生贄";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);background:#b83216;color:#fff;border:2px solid #ffd54a;border-radius:999px;padding:2px 7px;font-size:.55rem;font-weight:900;z-index:20;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.55)}
+  .sacrifice-guide{padding:9px 12px;margin:2px 0 8px;border-radius:12px;background:linear-gradient(180deg,rgba(112,42,20,.96),rgba(53,20,12,.96));border:2px solid #e35d38;color:#fff;text-align:center;font-weight:900;line-height:1.45;font-size:.78rem}
+  .sacrifice-guide strong{color:#ffd54a;font-size:1.05em}
+
+  .field-ability-btn{position:absolute;right:-2px;top:-4px;border:1px solid #fff;background:#8f2c17;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.55rem;line-height:16px;padding:0;z-index:5;cursor:pointer}
+  .mana-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:55vh;overflow:auto;margin:10px 0 16px}
+  @media(max-width:560px){
+    body{width:100%;overflow-x:hidden}
+    .stage{max-width:480px;width:100%;padding:6px 5px calc(8px + var(--safe-b));gap:6px}
+    .game-topbar{gap:4px}.topbar-title{font-size:.68rem}
+    .game-topbar + header{margin-bottom:0}.game-topbar + header .noren{padding:5px 16px 6px}.game-topbar + header .noren h1{font-size:1.05rem}.game-topbar + header .noren p{font-size:.48rem}
+    .pbar{gap:5px;padding:5px 6px;border-radius:9px;min-width:0}.pbar .avatar{width:23px;height:23px;font-size:1rem}.pbar .pname{width:31px;font-size:.56rem}.deck-info{font-size:.48rem}.shields{gap:2px}.shield-icon{width:11px;height:16px}.mana-info{font-size:.55rem;gap:3px}.mana-info .orb{width:6px;height:6px}.mana-view-btn{font-size:.5rem;padding:3px 5px}
+    .table-layout{gap:5px}.center-col{gap:5px}.zone-label{font-size:.5rem}.zone{min-height:76px;padding:5px;gap:4px;border-radius:9px}.zone .card{width:55px;height:75px}.zone .card .emoji{font-size:1.15rem}.zone .card .name{font-size:.42rem}.zone .card .power{font-size:.48rem}.zone .card .ability-row{font-size:.42rem}
+    .message{font-size:.62rem;min-height:1.1em}.turn-indicator{font-size:.58rem;padding:5px 8px}.end-turn-btn{font-size:.66rem;padding:7px 14px}
+    .hand-wrap{padding:5px 4px 7px;border-radius:9px}.hand-title{font-size:.54rem;margin:0 3px 4px}.hand{gap:4px;padding:3px}.hand .card{width:55px;height:75px}.hand .card .emoji{font-size:1.15rem}.hand .card .name{font-size:.42rem}.hand .card .cost{width:14px;height:14px;font-size:.48rem}.hand .card .power{font-size:.48rem}.hand .card .ability-row{font-size:.42rem}.legend{font-size:.48rem;gap:6px}.legend i{width:6px;height:6px}
+  }
+
   .message {
     text-align: center;
     min-height: 1.3em;
@@ -563,6 +593,8 @@
 </head>
 <body>
 <div id="app">
+<div id="actionBanner" class="action-banner" aria-live="polite"></div>
+<div id="actionCardPreview" aria-live="polite"></div>
 
   <!-- ================= MENU SCREEN ================= -->
   <div class="screen" id="menuScreen">
@@ -629,7 +661,7 @@
             <div class="deck-info" id="cpuDeckCount">山札 —</div>
             <div class="shields" id="cpuShields"></div>
             <button class="graveyard-btn" id="cpuGraveyardBtn" type="button" title="三角コーナーを見る">🗑️<span id="cpuGraveyardCount">0</span></button>
-            <div class="mana-info" id="cpuManaInfo"></div>
+            <div class="mana-info" id="cpuManaInfo"></div><button class="mana-view-btn" id="cpuManaViewBtn" type="button">見る</button>
           </div>
         </div>
 
@@ -655,7 +687,7 @@
             <div class="deck-info" id="playerDeckCount">山札 —</div>
             <div class="shields" id="playerShields"></div>
             <button class="graveyard-btn" id="playerGraveyardBtn" type="button" title="三角コーナーを見る">🗑️<span id="playerGraveyardCount">0</span></button>
-            <div class="mana-info" id="playerManaInfo"></div>
+            <div class="mana-info" id="playerManaInfo"></div><button class="mana-view-btn" id="playerManaViewBtn" type="button">見る</button>
           </div>
         </div>
       </div>
@@ -725,6 +757,15 @@
     </div>
   </div>
 
+  <!-- ================= MANA OVERLAY ================= -->
+  <div class="overlay" id="manaOverlay">
+    <div class="overlay-card graveyard-overlay-card">
+      <h2 id="manaTitle">マナゾーン</h2>
+      <div class="mana-grid" id="manaGrid"></div>
+      <div class="overlay-btn-row"><button id="manaCloseBtn" class="secondary-result-btn">閉じる</button></div>
+    </div>
+  </div>
+
   <!-- ================= GRAVEYARD OVERLAY ================= -->
   <div class="overlay" id="graveyardOverlay">
     <div class="overlay-card graveyard-overlay-card">
@@ -748,7 +789,7 @@
     // ---- spicy (辛い) ----
     { id: "chili",   kind: "creature", name: "唐辛子",   emoji: "🌶️", attr: "spicy", cost: 1, power: 2, abilities: [] },
     { id: "taco",     kind: "creature", name: "タコス",   emoji: "🌮", attr: "spicy", cost: 2, power: 4, abilities: [] },
-    { id: "mabo",     kind: "creature", name: "麻婆豆腐", emoji: "🌶️", attr: "spicy", cost: 2, power: 3, abilities: ["pierce"] },
+    { id: "mabo",     kind: "creature", name: "麻婆豆腐", emoji: "🌶️", attr: "spicy", cost: 2, power: 3, abilities: ["pierce", "self_destruct"] },
     { id: "venom_curry", kind: "creature", name: "猛毒カレー", emoji: "☠️", attr: "spicy", cost: 3, power: 2, abilities: ["poison"] },
     { id: "tantan",   kind: "creature", name: "担々麺",   emoji: "🍜", attr: "spicy", cost: 3, power: 5, abilities: [] },
     { id: "kimchi",   kind: "creature", name: "キムチ鍋", emoji: "🍲", attr: "spicy", cost: 3, power: 4, abilities: ["etb_burn"] },
@@ -785,6 +826,24 @@
     { id: "millefeu", kind: "creature", name: "ミルフィーユ", emoji: "🥐", attr: "sweet", cost: 5, power: 6, abilities: ["pierce"] },
     { id: "double_feast", kind: "creature", name: "食い尽くし双子", emoji: "🍡", attr: "sweet", cost: 5, power: 6, abilities: ["double_break"] },
     { id: "decotower",kind: "creature", name: "デコレーションケーキタワー", emoji: "🎂", attr: "sweet", cost: 6, power: 9, abilities: ["guardian"] },
+
+
+    // ---- 新アビリティ系クリーチャー：各属性5体ずつ ----
+    { id: "tri_discount_spicy", kind: "creature", name: "三味の辛味料理人", emoji: "🌶️", attr: "spicy", cost: 3, power: 3, abilities: ["tri_discount"] },
+    { id: "sacrifice_spicy", kind: "creature", name: "火祭りの生贄長", emoji: "🔥", attr: "spicy", cost: 3, power: 4, abilities: ["sacrifice"] },
+    { id: "mana_summon_spicy", kind: "creature", name: "炎脈の解放師", emoji: "🌋", attr: "spicy", cost: 5, power: 6, abilities: ["mana_summon"] },
+    { id: "grave_summon_spicy", kind: "creature", name: "残火の再生師", emoji: "♻️", attr: "spicy", cost: 5, power: 5, abilities: ["grave_summon"] },
+    { id: "double_attack_spicy", kind: "creature", name: "二刀流激辛剣士", emoji: "🍴", attr: "spicy", cost: 5, power: 7, abilities: ["double_attack"] },
+    { id: "tri_discount_salty", kind: "creature", name: "三味の出汁料理人", emoji: "🧂", attr: "salty", cost: 3, power: 3, abilities: ["tri_discount"] },
+    { id: "sacrifice_salty", kind: "creature", name: "塩釜の生贄長", emoji: "🔪", attr: "salty", cost: 3, power: 4, abilities: ["sacrifice"] },
+    { id: "mana_summon_salty", kind: "creature", name: "水脈の解放師", emoji: "💧", attr: "salty", cost: 5, power: 6, abilities: ["mana_summon"] },
+    { id: "grave_summon_salty", kind: "creature", name: "海底の再生師", emoji: "♻️", attr: "salty", cost: 5, power: 5, abilities: ["grave_summon"] },
+    { id: "double_attack_salty", kind: "creature", name: "二刀流寿司将軍", emoji: "🍣", attr: "salty", cost: 5, power: 7, abilities: ["double_attack"] },
+    { id: "tri_discount_sweet", kind: "creature", name: "三味の甘味料理人", emoji: "🍬", attr: "sweet", cost: 3, power: 3, abilities: ["tri_discount"] },
+    { id: "sacrifice_sweet", kind: "creature", name: "砂糖祭の生贄長", emoji: "🍰", attr: "sweet", cost: 3, power: 4, abilities: ["sacrifice"] },
+    { id: "mana_summon_sweet", kind: "creature", name: "蜜脈の解放師", emoji: "🍯", attr: "sweet", cost: 5, power: 6, abilities: ["mana_summon"] },
+    { id: "grave_summon_sweet", kind: "creature", name: "甘味の再生師", emoji: "♻️", attr: "sweet", cost: 5, power: 5, abilities: ["grave_summon"] },
+    { id: "double_attack_sweet", kind: "creature", name: "二刀流パティシエ", emoji: "🍴", attr: "sweet", cost: 5, power: 7, abilities: ["double_attack"] },
 
     // ---- extra spicy (追加カード) ----
     { id: "spicy_01", kind: "creature", name: "麻辣火鍋", emoji: "🥘", attr: "spicy", cost: 1, power: 1, abilities: ["etb_burn"] },
@@ -899,7 +958,7 @@
     { id: "recipe_potato", kind: "recipe", name: "じゃがいも料理帳", emoji: "📖", cost: 1, effect: { type: "evolve", sourceIds: ["potato"], resultIds: ["fries", "croquette"] }, desc: "場の「じゃがいも」素材をフライドポテトかコロッケに調理" },
     { id: "recipe_mochi", kind: "recipe", name: "もち菓子秘伝", emoji: "📖", cost: 1, effect: { type: "evolve", sourceIds: ["mochi"], resultIds: ["dango", "daifuku"] }, desc: "場の「もち」素材を団子か大福に調理" },
     { id: "recipe_tomato", kind: "recipe", name: "トマトの錬金術", emoji: "📖", cost: 1, effect: { type: "evolve", sourceIds: ["tomato"], resultIds: ["napolitan", "tomato_curry"] }, desc: "場の「トマト」素材をナポリタンかトマトカレーに調理" },
-    { id: "recipe_ultimate", kind: "recipe", name: "究極料理研究録", emoji: "📕", cost: 2, effect: { type: "evolve", isUltimateResearch: true, sourceIds: ["rice", "egg", "bread", "noodles", "fish_ingredient", "potato", "mochi", "tomato"], resultIds: ["curry", "omurice", "ramen", "sushi", "parfait", "yakisoba", "napolitan", "daifuku"] }, desc: "場の素材1体を、表示された完成料理の中から1体へ調理" },
+    { id: "recipe_ultimate", kind: "recipe", name: "究極料理研究録", emoji: "📕", cost: 2, effect: { type: "ultimate_evolve", isUltimateResearch: true }, desc: "すでに進化・調理されたキャラ1体を、もう一段階強く究極進化させる（パワー+5）" },
   ];
 
   // Recipe results that are not already in the original pool.
@@ -920,6 +979,12 @@
 
   // Spell cards: {id, name, emoji, cost, effect, desc}
   const SPELL_POOL = [
+    { id: "spell_super_distribution", kind: "spell", name: "超配給", emoji: "🚚", cost: 8, effect: { type: "mass_mana_summon" }, desc: "各プレイヤーはマナゾーンにある食べ物をすべて場に出す。コストは支払わず、召喚酔いする（速攻は除く）" },
+    { id: "legend_three_star_recipe", kind: "spell", rarity: "legend", name: "三ツ星シェフのレシピ", emoji: "👨‍🍳", cost: 4, effect: { type: "legend_to_hand" }, desc: "自分の山札からレジェンドカードを1枚手札に加える" },
+    { id: "time_sale", kind: "spell", name: "タイムセール", emoji: "🏷️", cost: 2, effect: { type: "food_discount_all", amount: 1 }, desc: "このターン、場に出す食べ物すべてのコストを-1する。下限1" },
+    { id: "discount_sticker", kind: "spell", name: "割引シール", emoji: "🔖", cost: 1, effect: { type: "food_discount_next", amount: 3 }, desc: "次に出す食べ物1体のコストを-3する。下限1" },
+    { id: "hunger", kind: "spell", name: "飢餓", emoji: "🥣", cost: 2, effect: { type: "food_cost_penalty", amount: 2 }, desc: "次の相手のターンに出す食べ物のコストをすべて+2する" },
+    { id: "health_center", kind: "spell", name: "保健所", emoji: "🏥", cost: 3, effect: { type: "spell_lock_next", amount: 1 }, desc: "次の相手のターン、スペルの使用を禁止する" },
     { id: "slash",       kind: "spell", name: "千切り",       emoji: "⚔️", cost: 1, effect: { type: "destroy_le", threshold: 2 }, desc: "パワー2以下の相手クリーチャーを1体破壊する" },
     { id: "flame",       kind: "spell", name: "強火",   emoji: "🔥", cost: 3, effect: { type: "destroy_le", threshold: 5 }, desc: "パワー5以下の相手クリーチャーを1体破壊する" },
     { id: "tailwind",    kind: "spell", name: "調味料",     emoji: "🌬️", cost: 1, effect: { type: "buff_perm", amount: 2 }, desc: "自分のクリーチャー1体のパワーを永続+2する" },
@@ -1218,6 +1283,7 @@
     {id:"legend_organic_empress",kind:"creature",rarity:"legend",name:"有機栽培の女帝",emoji:"👸",attr:"sweet",cost:7,power:12,abilities:["organic_growth","crop_rotation","etb_shield","shield_guard"]},
     {id:"legend_harvest_dragon",kind:"creature",rarity:"legend",name:"大地の豊穣竜",emoji:"🐲",attr:"salty",cost:8,power:15,abilities:["harvest","organic_growth","double_break","first_strike"]},
     {id:"legend_kitchen_phoenix",kind:"creature",rarity:"legend",name:"厨房不死鳥",emoji:"🔥",attr:"spicy",cost:8,power:14,abilities:["kitchen_recycle","death_draw","death_burn","haste"]},
+    {id:"legend_molokheiya",kind:"creature",rarity:"legend",name:"モロヘイヤ",emoji:"🌿",attr:"sweet",cost:20,power:44,abilities:["haste","double_break","battle_buff","deck_proof"]},
     {id:"legend_compost_spell",kind:"spell",rarity:"legend",name:"究極三角コーナー制御",emoji:"🗑️",cost:6,effect:{type:"legend_recycle"},desc:"三角コーナーから最大3枚を手札へ戻し、その後山札を整える"},
     {id:"legend_organic_spell",kind:"spell",rarity:"legend",name:"自然循環の奇跡",emoji:"🌎",cost:7,effect:{type:"legend_organic"},desc:"素材を最大3枚回収し、自分の全クリーチャーを永続+3する"},
     {id:"legend_farm_scythe",kind:"equipment",rarity:"legend",name:"豊穣神の鎌",emoji:"🌾",cost:5,effect:{type:"equip",amount:5,ability:"organic_growth"},desc:"自分のクリーチャー1体にパワー+5と「有機栽培」を与える"},
@@ -1286,6 +1352,13 @@
     counter:      { icon: "🥊", label: "反撃", desc: "攻撃された時、このターン中パワー+2する" },
     combo:        { icon: "🍳", label: "コンボ", desc: "自分の場に同じ属性の仲間がいる時、パワー+2" },
     chef:         { icon: "👨‍🍳", label: "料理人", desc: "レシピカードのコストを1下げる" },
+    tri_discount: { icon: "🍽️", label: "三味割引", desc: "自分の場にいる間、このキャラと同じ属性の食べ物のコストを-1する。下限1" },
+    sacrifice:    { icon: "🗑️", label: "生贄", desc: "自分のターンに1回、場の食べ物を好きな数三角コーナーへ送り、送った数だけ次に出す食べ物のコストを-1する。下限1" },
+    mana_summon:  { icon: "💧", label: "マナ解放", desc: "自分のターンに1回、マナゾーンからコスト3以下の食べ物1体をコストを支払わず場に出す。召喚酔いする" },
+    grave_summon: { icon: "♻️", label: "三角再生", desc: "自分のターンに1回、三角コーナーからコスト3以下の食べ物1体をコストを支払わず場に出す。召喚酔いする" },
+    double_attack:{ icon: "⚔️", label: "二回攻撃", desc: "このクリーチャーは1ターンに2回まで攻撃できる" },
+    self_destruct: { icon: "💥", label: "自壊", desc: "攻撃した後、このクリーチャーは破壊される" },
+    deck_proof:   { icon: "♾️", label: "完全無欠", desc: "このカードが場にある限り、自分は山札切れで敗北しない" },
     shield_guard: { icon: "🛡️", label: "鉄壁", desc: "シールドが3枚以上ある時、パワー+2" },
     recipe_draw:  { icon: "📖", label: "料理知識", desc: "登場した時、レシピカードを1枚引く" },
     double_spell: { icon: "✨", label: "二度調理", desc: "スペルを使った時、次のターン開始時にカードを1枚引く" },
@@ -1320,7 +1393,7 @@
   const DECK_SLOT_COUNT = 8;
   let deckSlots = Array.from({length: DECK_SLOT_COUNT}, () => null);
   let activeDeckSlot = 0;
-  let currentDifficulty = "normal";
+  let currentDifficulty = "hard";
   let customArt = {}; // { cardId: dataURL } — user-uploaded card art overrides
 
   function saveCustomArtToStorage() {
@@ -1344,6 +1417,48 @@
   }
   function el(id) { return document.getElementById(id); }
   function setMessage(t) { el("message").textContent = t; }
+  let actionBannerTimer=null;
+  let actionCardPreviewTimer=null;
+  function showActionBanner(text, kind="spell", opponent=false, cardId=null) {
+    const b=el("actionBanner"); if(!b)return;
+    b.textContent=text;
+    b.className="action-banner show "+kind+(opponent?" opponent":"");
+    clearTimeout(actionBannerTimer);
+    actionBannerTimer=setTimeout(()=>b.className="action-banner",3200);
+
+    const preview=el("actionCardPreview");
+    if(preview){
+      preview.innerHTML="";
+      const shownId=cardId || null;
+      const card=shownId ? cardById(shownId) : null;
+      if(card){
+        const node=cardNode({...card, _displayCost:card.cost},{noInfoBtn:true,extraClass:"action-card-preview"});
+        preview.appendChild(node);
+        preview.className="show";
+        clearTimeout(actionCardPreviewTimer);
+        actionCardPreviewTimer=setTimeout(()=>{preview.className="";preview.innerHTML=""},3200);
+      }else{
+        preview.className="";
+      }
+    }
+
+    // オンライン対戦では、バナーと同時に「実際に出したカードID」も送る。
+    // 受信側は同じカード定義からカードそのものを即時表示する。
+    if(!opponent && typeof onlineMode!=="undefined" && onlineMode &&
+       typeof onlineApplying!=="undefined" && !onlineApplying &&
+       typeof onlineConn!=="undefined" && onlineConn && onlineConn.open){
+      try{
+        onlineConn.send({
+          type:"action_banner",
+          protocol:22,
+          from:onlineRole,
+          text:String(text),
+          kind:String(kind||"spell"),
+          cardId:cardId || null
+        });
+      }catch(e){}
+    }
+  }
   function effPower(c) {
     let p = c.power + (c.buffPerm || 0) + (c.buffTemp || 0);
     if (c.abilities && c.abilities.includes("shield_guard") && c._ownerShields >= 3) p += 2;
@@ -1576,6 +1691,8 @@
       locked: !!canonical.locked,
       selectedHandUid:null,
       selectedAttackerUid:null,
+      selectedFieldAbilityUid:null,
+      abilityClosedUid:null,
       pendingSpell:null,
       difficulty: canonical.difficulty || currentDifficulty
     };
@@ -1611,7 +1728,14 @@
       graveyard:zone("graveyard"),
       manaUsed:Number(p && p.manaUsed || 0),
       manaChargesLeft:Number(p && p.manaChargesLeft == null ? 1 : p.manaChargesLeft),
-      deckedOut:!!(p && p.deckedOut)
+      deckedOut:!!(p && p.deckedOut),
+      foodDiscountThisTurn:Number(p && p.foodDiscountThisTurn||0),
+      nextFoodDiscount:Number(p && p.nextFoodDiscount||0),
+      pendingFoodPenalty:Number(p && p.pendingFoodPenalty||0),
+      foodCostPenalty:Number(p && p.foodCostPenalty||0),
+      pendingSpellLock:!!(p && p.pendingSpellLock),
+      spellLocked:!!(p && p.spellLocked),
+      lastAction:p && p.lastAction ? p.lastAction : null
     };
   }
   // ターン変更ではこの関数を使わない。通常の状態復元用途として残す。
@@ -1653,6 +1777,13 @@
     target.manaUsed=Number(compact.manaUsed||0);
     target.manaChargesLeft=Number(compact.manaChargesLeft==null ? 1 : compact.manaChargesLeft);
     target.deckedOut=!!compact.deckedOut;
+    target.foodDiscountThisTurn=Number(compact.foodDiscountThisTurn||0);
+    target.nextFoodDiscount=Number(compact.nextFoodDiscount||0);
+    target.pendingFoodPenalty=Number(compact.pendingFoodPenalty||0);
+    target.foodCostPenalty=Number(compact.foodCostPenalty||0);
+    target.pendingSpellLock=!!compact.pendingSpellLock;
+    target.spellLocked=!!compact.spellLocked;
+    target.lastAction=compact.lastAction || null;
   }
   function onlineSendTurnChange(){
     if(!onlineMode || !onlineConn || !onlineConn.open || !S || onlineApplying) return false;
@@ -1728,6 +1859,8 @@
 
     S.pendingSpell=null;
     S.selectedHandUid=null;
+    // バナーは専用の action_banner パケットでリアルタイム表示する。
+    // compact_state は盤面同期専用で、ここでは再表示しない。
     S.selectedAttackerUid=null;
     S.locked=false;
   }
@@ -2179,6 +2312,15 @@
         return;
       }
 
+      if(data.type==="action_banner") {
+        // 相手がカードを使った瞬間・キャラを召喚した瞬間に表示。
+        // 盤面同期とは独立させることで、ターン終了を待たずリアルタイムに届く。
+        if(data.from !== onlineRole && data.text){
+          showActionBanner(String(data.text), String(data.kind||"spell"), true, data.cardId || null);
+        }
+        return;
+      }
+
       if(data.type==="turn_change"){
         try{
           // ターン交代パケットには、交代直前の確定盤面も含める。
@@ -2211,8 +2353,10 @@
             // 念のため受信後は操作可能状態に戻す。
             S.locked=false;
             S.pendingSpell=null;
+            S.pendingSacrifice=null;
             S.selectedHandUid=null;
             S.selectedAttackerUid=null;
+            S.selectedFieldAbilityUid=null;
             render();
           }
 
@@ -2372,7 +2516,11 @@
       locked:false,
       selectedHandUid:null,
       selectedAttackerUid:null,
+      selectedFieldAbilityUid:null,
       pendingSpell:null,
+      pendingSacrifice:null,
+      pendingZoneSummon:null,
+      lastAction:null,
       difficulty:currentDifficulty
     };
     draw(S.player,START_HAND);
@@ -2456,12 +2604,18 @@
       deck, shields,
       hand: [], field: [], manaZone: [], graveyard: [],
       manaUsed: 0, manaChargesLeft: 1, deckedOut: false,
+      foodDiscountThisTurn: 0, nextFoodDiscount: 0, pendingFoodPenalty: 0, foodCostPenalty: 0, pendingSpellLock: false, spellLocked: false,
     };
   }
 
   function draw(p, n) {
     for (let i = 0; i < n; i++) {
       if (p.deck.length === 0) {
+        // 「完全無欠」が場にある間は、山札切れによる敗北を無効化する。
+        if ((p.field || []).some(c => (c.abilities || []).includes("deck_proof"))) {
+          p.deckedOut = false;
+          return;
+        }
         p.deckedOut = true;
         // 山札が尽きた瞬間に勝敗を確定する。
         // これまでは deckedOut フラグだけを立てて次のターン開始まで待っていたため、
@@ -2477,6 +2631,22 @@
 
   function isUnitCard(card) { return !!card && (card.kind === "creature" || card.kind === "material"); }
   function manaAvailable(p) { return p.manaZone.length - p.manaUsed; }
+  function foodCost(card, p, consumeNext=false) {
+    if (!isUnitCard(card)) return Math.max(0, card.cost || 0);
+    let discount = 0;
+    if (card.attr && (p.field || []).some(c => (c.abilities || []).includes("tri_discount") && c.attr === card.attr)) discount += 1;
+    discount += Number(p.foodDiscountThisTurn || 0);
+    discount += Number(p.nextFoodDiscount || 0);
+    const penalty = Number(p.foodCostPenalty || 0);
+    const cost = Math.max(1, Number(card.cost || 0) - discount + penalty);
+    if (consumeNext && p.nextFoodDiscount > 0) p.nextFoodDiscount = 0;
+    return cost;
+  }
+  function actualCardCost(card, p, consumeNext=false) {
+    if (isUnitCard(card)) return foodCost(card,p,consumeNext);
+    const recipeDiscount = card.kind === "recipe" ? p.field.reduce((n,c) => n + ((c.abilities || []).includes("chef") ? 1 : 0) + ((c.abilities || []).includes("recipe_master") ? 1 : 0), 0) : 0;
+    return Math.max(0, card.cost - recipeDiscount);
+  }
 
   // ================= Setup =================
   function initGame() {
@@ -2517,7 +2687,7 @@
 
     const cost = document.createElement("span");
     cost.className = "cost";
-    cost.textContent = card.cost;
+    cost.textContent = card._displayCost != null ? card._displayCost : card.cost;
     wrap.appendChild(cost);
 
     if (card.kind === "spell" || card.kind === "recipe" || card.kind === "equipment") {
@@ -2676,10 +2846,12 @@
       if (opts.targetMode) {
         const valid = !opts.isValidTarget || opts.isValidTarget(creature);
         cls.push(valid ? "selectable target-hint" : "not-target");
-      } else if (opts.selectableAttacker && !creature.tapped && !creature.sick) {
+      } else if (opts.selectableAttacker && !creature.sick && (!creature.tapped || ((creature.abilities || []).includes("double_attack") && Number(creature.attacksThisTurn||0) < 2))) {
         cls.push("selectable");
+        if ((creature.abilities || []).includes("double_attack") && Number(creature.attacksThisTurn||0) === 1) cls.push("attacker-selected");
       }
       if (S.selectedAttackerUid === creature.uid) cls.push("attacker-selected");
+      if (S.pendingSacrifice && S.pendingSacrifice.selectedUids.includes(creature.uid)) cls.push("sacrifice-selected");
       const node = cardNode(creature, { extraClass: cls.join(" ") });
       if (opts.onClick) {
         node.addEventListener("click", () => {
@@ -2709,8 +2881,11 @@
     el("cpuGraveyardCount").textContent = S.cpu.graveyard.length;
 
     const pending = S.pendingSpell;
+    const sacrificeMode = !!S.pendingSacrifice;
+    const zoneSummonMode = !!S.pendingZoneSummon;
     const enemyTargetMode = !!pending && (pending.effect.type === "destroy_le" || pending.effect.type === "bounce");
     const ownTargetMode = !!pending && (pending.effect.type === "buff_perm" || pending.effect.type === "grant_haste");
+    const ultimateEvolveTargetMode = !!pending && pending.effect.type === "ultimate_evolve" && !pending.targetUid;
     const equipTargetMode = !!pending && pending.effect.type === "equip";
     const evolveTargetMode = !!pending && pending.effect.type === "evolve" && !pending.targetUid;
     const alchemyTargetMode = !!pending && pending.effect.type === "grave_alchemy" && !pending.targetUid;
@@ -2738,14 +2913,20 @@
     });
 
     renderZone("playerZone", S.player, {
-      targetMode: ownTargetMode || equipTargetMode || evolveTargetMode || alchemyTargetMode || exchangeTargetMode,
+      targetMode: ownTargetMode || ultimateEvolveTargetMode || equipTargetMode || evolveTargetMode || alchemyTargetMode || exchangeTargetMode || sacrificeMode,
       selectableAttacker: S.turn === "player" && !S.locked && !pending,
       isValidTarget: (creature) => {
+        if (ultimateEvolveTargetMode) return isUnitCard(creature) && !creature.ultimateEvolved && (creature.isCooked === true || String(creature.id || "").startsWith("exp_") || creature._evolved === true || creature.subtype === "evolution");
         if (evolveTargetMode) return recipeAvailableSources({ effect: pending.effect }).some((c) => c.uid === creature.uid);
         if (equipTargetMode || alchemyTargetMode || exchangeTargetMode) return isUnitCard(creature);
+        if (sacrificeMode) return creature.uid !== S.pendingSacrifice.sourceUid && isUnitCard(creature);
         return true;
       },
       onClick: (creature) => {
+        if (ultimateEvolveTargetMode) {
+          resolveSpellTarget(creature);
+          return;
+        }
         if (evolveTargetMode) {
           pending.targetUid = creature.uid;
           setMessage(creature.name + "を進化対象にしました。完成料理を選んでください。");
@@ -2766,8 +2947,16 @@
         }
         if (equipTargetMode) { resolveSpellTarget(creature); return; }
         if (ownTargetMode) { resolveSpellTarget(creature); return; }
+        if (sacrificeMode) { toggleSacrificeTarget(creature.uid); return; }
+        if (zoneSummonMode) return;
         if (S.turn !== "player" || S.locked || pending) return;
-        if (creature.tapped || creature.sick) return;
+        if (creature.sick || (creature.tapped && !((creature.abilities || []).includes("double_attack") && Number(creature.attacksThisTurn||0) < 2))) return;
+        // アビリティ持ちでも、いきなり生贄モードには入らない。
+        // まずアビリティ選択画面を開き、「生贄」か「攻撃する」かを選べるようにする。
+        if (!S.selectedAttackerUid && S.abilityClosedUid !== creature.uid && (creature.abilities||[]).some(a => ["sacrifice","mana_summon","grave_summon"].includes(a))) {
+          S.selectedFieldAbilityUid = creature.uid; render(); return;
+        }
+        if (S.abilityClosedUid === creature.uid) S.abilityClosedUid = null;
         if (S.selectedAttackerUid === creature.uid) {
           S.selectedAttackerUid = null;
           render();
@@ -2808,12 +2997,14 @@
     handEl.innerHTML = "";
     S.player.hand.forEach((card) => {
       const avail = manaAvailable(S.player);
-      const unaffordable = card.cost > avail;
+      const unaffordable = actualCardCost(card, S.player, false) > avail;
       const cls = card.uid === S.selectedHandUid ? "selected" : (unaffordable ? "unaffordable" : "");
-      const node = cardNode(card, { extraClass: cls });
+      const displayCard = {...card, _displayCost: actualCardCost(card,S.player,false)};
+      const node = cardNode(displayCard, { extraClass: cls });
       node.addEventListener("click", () => {
         if (S.turn !== "player" || S.locked || S.pendingSpell) return;
         S.selectedAttackerUid = null;
+        S.abilityClosedUid = null;
         S.selectedHandUid = S.selectedHandUid === card.uid ? null : card.uid;
         render();
       });
@@ -2833,6 +3024,9 @@
   }
 
   function recipeHasValidTarget(card) {
+    if (card.effect?.type === "ultimate_evolve") {
+      return S.player.field.some(c => isUnitCard(c) && !c.ultimateEvolved && (c.isCooked === true || String(c.id || "").startsWith("exp_") || c._evolved === true || c.subtype === "evolution"));
+    }
     return card.kind === "recipe" && recipeAvailableSources(card).length > 0 &&
       ((card.effect.resultIds || []).some((id) => ALL_CARDS.some((c) => c.id === id)));
   }
@@ -2852,12 +3046,143 @@
     return true;
   }
 
+  function startSacrificeMode(sourceUid){
+    if(!S || S.turn!=="player" || S.locked) return;
+    const source=S.player.field.find(c=>c.uid===sourceUid);
+    if(!source || !(source.abilities||[]).includes("sacrifice") || source._sacrificeUsed) return;
+    const candidates=S.player.field.filter(c=>c.uid!==sourceUid && isUnitCard(c));
+    if(!candidates.length){ setMessage("生贄にできる食べ物がありません。"); return; }
+    S.pendingSacrifice={sourceUid,selectedUids:[]};
+    S.selectedHandUid=null;
+    S.abilityClosedUid=null;
+    setMessage("生贄モード：光っている食べ物をタップして選択 → 下の「生贄を実行」。何体でも選べます。");
+    render();
+  }
+  function toggleSacrificeTarget(uid){
+    if(!S.pendingSacrifice) return;
+    const arr=S.pendingSacrifice.selectedUids; const i=arr.indexOf(uid);
+    if(i>=0) arr.splice(i,1); else arr.push(uid);
+    render();
+  }
+  function resolveSacrifice(){
+    if(!S.pendingSacrifice) return;
+    const p=S.player; const ids=S.pendingSacrifice.selectedUids||[];
+    if(!ids.length){setMessage("1体以上選んでください。");return;}
+    const source=p.field.find(c=>c.uid===S.pendingSacrifice.sourceUid);
+    if(!source || source._sacrificeUsed) { S.pendingSacrifice=null; render(); return; }
+    const moved=[];
+    p.field=p.field.filter(c=>{if(ids.includes(c.uid) && c.uid!==source.uid){moved.push(c);return false;}return true;});
+    moved.forEach(c=>p.graveyard.push(c));
+    source._sacrificeUsed=true;
+    p.nextFoodDiscount=(p.nextFoodDiscount||0)+moved.length;
+    S.lastAction="🗑️ 生贄 " + moved.length + "体 → 次の食べ物コスト-" + moved.length;
+    showActionBanner(S.lastAction,"spell");
+    S.pendingSacrifice=null;
+    setMessage("生贄で"+moved.length+"体を三角コーナーへ。次の食べ物コストを"+moved.length+"軽減！");
+    render();
+  }
+  function startZoneSummonMode(sourceUid, zoneKey){
+    if(!S || S.turn!=="player" || S.locked) return;
+    const source=S.player.field.find(c=>c.uid===sourceUid);
+    const ability=zoneKey==="manaZone"?"mana_summon":"grave_summon";
+    if(!source || !(source.abilities||[]).includes(ability) || source._zoneSummonUsed) return;
+    const pool=(S.player[zoneKey]||[]).filter(c=>isUnitCard(c) && Number(c.cost||0)<=3);
+    if(!pool.length){setMessage(zoneKey==="manaZone"?"マナゾーンに出せるコスト3以下の食べ物がありません。":"三角コーナーに出せるコスト3以下の食べ物がありません。");return;}
+    S.pendingZoneSummon={sourceUid,zoneKey};
+    S.selectedHandUid=null;
+    S.abilityClosedUid=null;
+    setMessage((zoneKey==="manaZone"?"マナ解放":"三角再生")+"：出す食べ物を選んでください。");
+    render();
+  }
+  function resolveZoneSummon(cardUid){
+    const pending=S.pendingZoneSummon; if(!pending)return;
+    const p=S.player; const source=p.field.find(c=>c.uid===pending.sourceUid); const zone=p[pending.zoneKey];
+    const idx=zone.findIndex(c=>c.uid===cardUid);
+    if(!source||source._zoneSummonUsed||idx<0)return;
+    const card=zone[idx]; if(!isUnitCard(card)||Number(card.cost||0)>3)return;
+    zone.splice(idx,1);
+    p.field.push({...card,tapped:false,sick:true,buffPerm:card.buffPerm||0,buffTemp:0,attacksThisTurn:0});
+    source._zoneSummonUsed=true;
+    S.pendingZoneSummon=null;
+    S.lastAction=(pending.zoneKey==="manaZone"?"💧 マナ解放：":"♻️ 三角再生：")+card.name+"を場へ！";
+    showActionBanner(S.lastAction,"spell");
+    setMessage(card.name+"を場に出しました！召喚酔いしています。");
+    render();
+  }
+  function cancelZoneSummon(){S.pendingZoneSummon=null;setMessage("キャンセルしました。");render();}
+
+  function cancelSacrifice(){S.pendingSacrifice=null;setMessage("生贄をキャンセルしました。");render();}
+
   function renderActionSheet() {
     const sheet = el("actionSheet");
+
+    if (S.pendingZoneSummon) {
+      sheet.style.display="flex"; sheet.innerHTML="";
+      const info=document.createElement("div"); info.className="spell-target-hint"; info.textContent=(S.pendingZoneSummon.zoneKey==="manaZone"?"💧 マナ解放":"♻️ 三角再生")+"：出すカードを選択"; sheet.appendChild(info);
+      const list=document.createElement("div"); list.className="recipe-result-list";
+      (S.player[S.pendingZoneSummon.zoneKey]||[]).filter(c=>isUnitCard(c)&&Number(c.cost||0)<=3).forEach(card=>{
+        const btn=document.createElement("button"); btn.type="button"; btn.className="recipe-result-option";
+        btn.innerHTML="<div class=\"recipe-result-icon\">"+(card.emoji||"🍳")+"</div><div class=\"recipe-result-main\"><div class=\"recipe-result-name\">"+card.name+"</div><div class=\"recipe-result-stats\">コスト "+card.cost+"　／　パワー "+card.power+"</div></div>";
+        btn.addEventListener("click",()=>resolveZoneSummon(card.uid)); list.appendChild(btn);
+      }); sheet.appendChild(list);
+      const cancel=document.createElement("button"); cancel.className="btn-cancel"; cancel.textContent="キャンセル"; cancel.addEventListener("click",cancelZoneSummon); sheet.appendChild(cancel); return;
+    }
+    if (S.selectedFieldAbilityUid) {
+      sheet.style.display="flex"; sheet.innerHTML="";
+      const source=S.player.field.find(c=>c.uid===S.selectedFieldAbilityUid);
+      if(source){
+        const info=document.createElement("div"); info.className="spell-target-hint"; info.textContent="⚙️ "+source.name+"のアビリティ"; sheet.appendChild(info);
+        const row=document.createElement("div"); row.className="action-sheet-buttons";
+        if((source.abilities||[]).includes("sacrifice")&&!source._sacrificeUsed){const b=document.createElement("button");b.className="btn-summon";b.textContent="🗑️ 生贄";b.onclick=()=>{S.selectedFieldAbilityUid=null;startSacrificeMode(source.uid);};row.appendChild(b);}
+        if((source.abilities||[]).includes("mana_summon")&&!source._zoneSummonUsed){const b=document.createElement("button");b.className="btn-mana";b.textContent="💧 マナ解放";b.onclick=()=>startZoneSummonMode(source.uid,"manaZone");row.appendChild(b);}
+        if((source.abilities||[]).includes("grave_summon")&&!source._zoneSummonUsed){const b=document.createElement("button");b.className="btn-summon";b.textContent="♻️ 三角再生";b.onclick=()=>startZoneSummonMode(source.uid,"graveyard");row.appendChild(b);}
+        const cancel=document.createElement("button");cancel.className="btn-cancel";cancel.textContent="閉じる";cancel.onclick=()=>{
+          S.selectedFieldAbilityUid=null;
+          S.abilityClosedUid=source.uid;
+          render();
+        };row.appendChild(cancel); sheet.appendChild(row);
+      }
+      return;
+    }
+
+    if (S.pendingSacrifice) {
+      sheet.style.display="flex"; sheet.innerHTML="";
+      const count=S.pendingSacrifice.selectedUids.length;
+      const info=document.createElement("div"); info.className="sacrifice-guide";
+      info.innerHTML="🗑️ <strong>生贄を選択中："+count+"体</strong><br>場の食べ物をタップすると選択／解除できます。<br>選んだ数だけ<strong>次の食べ物のコストが-1</strong>になります。";
+      sheet.appendChild(info);
+      const row=document.createElement("div"); row.className="action-sheet-buttons";
+      const ok=document.createElement("button"); ok.className="btn-summon"; ok.textContent="🗑️ "+(count?"「"+count+"体」を生贄にする":"生贄を選ぶ"); ok.disabled=!count; ok.addEventListener("click",resolveSacrifice);
+      const clear=document.createElement("button"); clear.className="btn-cancel"; clear.textContent="選択を全部解除"; clear.disabled=!count; clear.addEventListener("click",()=>{S.pendingSacrifice.selectedUids=[];render();});
+      const cancel=document.createElement("button"); cancel.className="btn-cancel"; cancel.textContent="キャンセル"; cancel.addEventListener("click",cancelSacrifice);
+      row.append(ok,clear,cancel); sheet.appendChild(row); return;
+    }
 
     if (S.pendingSpell) {
       sheet.style.display = "flex";
       sheet.innerHTML = "";
+
+      if (S.pendingSpell.effect.type === "ultimate_evolve") {
+        const info = document.createElement("div");
+        info.className = "spell-target-hint";
+        info.textContent = "📕 もう進化しているキャラを選んでください";
+        sheet.appendChild(info);
+        const list = document.createElement("div");
+        list.className = "recipe-result-list";
+        S.player.field.filter(c => isUnitCard(c) && !c.ultimateEvolved && (c.isCooked === true || String(c.id || "").startsWith("exp_") || c._evolved === true || c.subtype === "evolution")).forEach(card => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "recipe-result-option";
+          btn.innerHTML = "<div class=\"recipe-result-icon\">" + (card.emoji || "🍳") + "</div><div class=\"recipe-result-main\"><div class=\"recipe-result-name\">" + card.name + " → " + card.name + "・極" + "</div><div class=\"recipe-result-stats\">パワー " + effPower(card) + " → " + (effPower(card) + 5) + "</div></div>";
+          btn.addEventListener("click", () => resolveSpellTarget(card));
+          list.appendChild(btn);
+        });
+        sheet.appendChild(list);
+        const cancel = document.createElement("button");
+        cancel.className = "btn-cancel"; cancel.textContent = "キャンセル"; cancel.addEventListener("click", cancelSpellTargeting);
+        sheet.appendChild(cancel);
+        return;
+      }
 
       if (S.pendingSpell.effect.type === "grave_alchemy") {
         const info = document.createElement("div");
@@ -3129,8 +3454,7 @@
     const actionBtn = document.createElement("button");
     actionBtn.className = "btn-summon";
     if (card.kind === "spell" || card.kind === "recipe" || card.kind === "equipment") {
-      const discount = card.kind === "recipe" ? S.player.field.reduce((n,c) => n + ((c.abilities || []).includes("chef") ? 1 : 0) + ((c.abilities || []).includes("recipe_master") ? 1 : 0), 0) : 0;
-      const actualCost = Math.max(0, card.cost - discount);
+      const actualCost = actualCardCost(card, S.player, false);
       actionBtn.textContent = card.kind === "recipe"
         ? "🍳調理する (コスト" + actualCost + ")"
         : (card.kind === "equipment" ? "🔧装備する (コスト" + actualCost + ")" : "📜使用する (コスト" + actualCost + ")");
@@ -3139,8 +3463,9 @@
       actionBtn.disabled = !canAfford || !hasTarget;
       actionBtn.addEventListener("click", () => castSpell(uid));
     } else {
-      actionBtn.textContent = "⚔️召喚する (コスト" + card.cost + ")";
-      actionBtn.disabled = manaAvailable(S.player) < card.cost;
+      const actualCost = actualCardCost(card, S.player, false);
+      actionBtn.textContent = "⚔️召喚する (コスト" + actualCost + ")";
+      actionBtn.disabled = manaAvailable(S.player) < actualCost;
       actionBtn.addEventListener("click", () => summonCreature(uid));
     }
 
@@ -3231,9 +3556,11 @@
     const idx = p.hand.findIndex((c) => c.uid === uid);
     if (idx === -1) return;
     const card = p.hand[idx];
-    if (manaAvailable(p) < card.cost) return;
+    const actualCost = actualCardCost(card, p, false);
+    if (manaAvailable(p) < actualCost) return;
     p.hand.splice(idx, 1);
-    p.manaUsed += card.cost;
+    if (isUnitCard(card) && p.nextFoodDiscount > 0) p.nextFoodDiscount = 0;
+    p.manaUsed += actualCost;
     const hasHaste = (card.abilities || []).includes("haste");
     const creature = { ...card, tapped: false, sick: !hasHaste, buffPerm: card.buffPerm || 0, buffTemp: 0 };
     if ((creature.abilities || []).includes("combo")) {
@@ -3245,7 +3572,10 @@
     }
     p.field.push(creature);
     S.selectedHandUid = null;
-    setMessage(card.name + "を召喚しました！" + (hasHaste ? "（速攻ですぐに攻撃できる）" : ""));
+    const costText = actualCost !== card.cost ? "（コスト" + actualCost + "で召喚）" : "";
+    setMessage(card.name + "を召喚しました！" + costText + (hasHaste ? "（速攻ですぐに攻撃できる）" : ""));
+    S.lastAction = "🍽️ " + card.name + "を召喚！" + costText;
+    showActionBanner(S.lastAction, "summon", false, card.id);
     applyEtb(creature, p, S.cpu);
     render();
   }
@@ -3292,6 +3622,42 @@
       case "extra_charge":
         caster.manaChargesLeft = (caster.manaChargesLeft || 0) + 1;
         break;
+      case "legend_to_hand": {
+        const idx = caster.deck.findIndex(c => c.rarity === "legend");
+        if (idx >= 0) {
+          const card = caster.deck.splice(idx, 1)[0];
+          caster.hand.push({ ...card, tapped:false, sick:false, buffPerm:0, buffTemp:0 });
+          setMessage("三ツ星シェフのレシピで「" + card.name + "」を手札に加えた！");
+        }
+        break;
+      }
+      case "mass_mana_summon": {
+        const summonFromMana = (owner, label) => {
+          const foods = (owner.manaZone || []).filter(c => isUnitCard(c));
+          const rest = (owner.manaZone || []).filter(c => !isUnitCard(c));
+          owner.manaZone = rest;
+          owner.manaUsed = Math.min(Number(owner.manaUsed || 0), owner.manaZone.length);
+          foods.forEach(card => {
+            const hasHaste = (card.abilities || []).includes("haste");
+            const creature = { ...card, tapped:false, sick:!hasHaste, buffPerm:card.buffPerm||0, buffTemp:0, attacksThisTurn:0 };
+            owner.field.push(creature);
+            applyEtb(creature, owner, owner === S.player ? S.cpu : S.player);
+          });
+          if (foods.length) setMessage(label + "で" + foods.length + "体の食べ物をマナから場へ出した！");
+        };
+        summonFromMana(caster, caster === S.player ? "あなたの超配給" : "CPUの超配給");
+        summonFromMana(opponent, opponent === S.player ? "あなたの超配給" : "CPUの超配給");
+        break;
+      }
+      case "ultimate_evolve": {
+        if (!target || !isUnitCard(target) || target.ultimateEvolved || !(target.isCooked === true || String(target.id || "").startsWith("exp_") || target._evolved === true || target.subtype === "evolution")) break;
+        target.buffPerm = (target.buffPerm || 0) + 5;
+        target.ultimateEvolved = true;
+        target._evolved = true;
+        target.name = target.name.replace(/・極$/, "") + "・極";
+        setMessage(target.name + "へ究極進化！パワー+5！");
+        break;
+      }
       case "grant_haste":
         if (target) target.sick = false;
         break;
@@ -3409,6 +3775,18 @@
         // Recipe resolution is handled by resolveRecipeTarget so the player can choose
         // one of several finished dishes. This branch is intentionally a safe no-op.
         break;
+      case "food_discount_all":
+        caster.foodDiscountThisTurn = Math.max(Number(caster.foodDiscountThisTurn||0), Number(effect.amount||1));
+        break;
+      case "food_discount_next":
+        caster.nextFoodDiscount = Math.max(Number(caster.nextFoodDiscount||0), Number(effect.amount||3));
+        break;
+      case "food_cost_penalty":
+        opponent.pendingFoodPenalty = Math.max(Number(opponent.pendingFoodPenalty||0), Number(effect.amount||2));
+        break;
+      case "spell_lock_next":
+        opponent.pendingSpellLock = true;
+        break;
       default:
         break;
     }
@@ -3419,13 +3797,13 @@
     const idx = p.hand.findIndex((c) => c.uid === uid);
     if (idx === -1) return;
     const card = p.hand[idx];
-    const recipeDiscount = card.kind === "recipe" ? p.field.reduce((n,c) => n + ((c.abilities || []).includes("chef") ? 1 : 0) + ((c.abilities || []).includes("recipe_master") ? 1 : 0), 0) : 0;
-    const actualCost = Math.max(0, card.cost - recipeDiscount);
+    if (p.spellLocked) { setMessage("保健所の効果中！このターンはスペルを使えません。"); return; }
+    const actualCost = actualCardCost(card, p, false);
     if (manaAvailable(p) < actualCost) return;
     const eff = card.effect;
     const needsTarget = eff.type === "destroy_le" || eff.type === "bounce" || eff.type === "buff_perm" ||
       eff.type === "grant_haste" || eff.type === "revive_from_graveyard" || eff.type === "evolve" || eff.type === "equip" || eff.type === "grave_alchemy" ||
-      eff.type === "mana_to_hand" || eff.type === "zone_exchange";
+      eff.type === "mana_to_hand" || eff.type === "zone_exchange" || eff.type === "ultimate_evolve";
     if (needsTarget) {
       if (!spellHasValidTarget(card)) return;
       S.pendingSpell = { uid: card.uid, effect: eff, actualCost };
@@ -3437,6 +3815,7 @@
     p.hand.splice(idx, 1);
     p.manaUsed += actualCost;
     applySpellEffect(eff, p, S.cpu, null);
+    S.lastAction = "📜 " + card.name + "を使用！";
     p.graveyard.push(card);
     if (p.field.some(c => (c.abilities || []).includes("kitchen_recycle"))) {
       const idx = p.graveyard.findIndex(c => c.isMaterial);
@@ -3444,6 +3823,7 @@
     }
     S.selectedHandUid = null;
     setMessage(card.name + "を使用した！三角コーナーへ送った。");
+    showActionBanner("📜 " + card.name + " を使用！", "spell", false, card.id);
     render();
   }
 
@@ -3457,6 +3837,7 @@
     p.hand.splice(idx, 1);
     p.manaUsed += (pending.actualCost ?? card.cost);
     applySpellEffect(pending.effect, p, S.cpu, target);
+    S.lastAction = "📜 " + card.name + "を使用！";
     p.graveyard.push(card);
     if (p.field.some(c => (c.abilities || []).includes("kitchen_recycle"))) {
       const idx = p.graveyard.findIndex(c => c.isMaterial);
@@ -3464,6 +3845,7 @@
     }
     S.pendingSpell = null;
     setMessage(card.name + "を使用した！三角コーナーへ送った。");
+    showActionBanner("📜 " + card.name + " を使用！", "spell", false, card.id);
     render();
   }
 
@@ -3502,12 +3884,15 @@
       tapped: oldTapped,
       sick: oldSick,
       buffPerm: 0,
-      buffTemp: 0
+      buffTemp: 0,
+      _evolved: true
     });
 
     S.pendingSpell = null;
     S.selectedHandUid = null;
     setMessage(sourceCard.name + "が「" + result.name + "」に進化した！");
+    S.lastAction = "📖 " + recipeCard.name + " → " + result.name + "！";
+    showActionBanner(S.lastAction, "spell", false, recipeCard.id);
     render();
   }
 
@@ -3608,8 +3993,12 @@
     if (!attacker || attacker.tapped || attacker.sick) return;
 
     S.locked = true;
-    attacker.tapped = true;
+    attacker.attacksThisTurn = Number(attacker.attacksThisTurn || 0) + 1;
+    const isDouble = (attacker.abilities || []).includes("double_attack");
+    if (!isDouble || attacker.attacksThisTurn >= 2) attacker.tapped = true;
     S.selectedAttackerUid = null;
+    S.lastAction = "⚔️ " + attacker.name + "が攻撃！";
+    showActionBanner(S.lastAction, "attack");
 
     if ((attacker.abilities || []).includes("attack_draw")) draw(attackerOwner, 1);
     if ((attacker.abilities || []).includes("attack_buff")) attacker.buffTemp = (attacker.buffTemp || 0) + 2;
@@ -3617,7 +4006,7 @@
       const caller = attackerOwner.deck.find(c => isUnitCard(c) && c.cost <= 2);
       if (caller) {
         attackerOwner.deck = attackerOwner.deck.filter(c => c.uid !== caller.uid);
-        const summoned = { ...caller, tapped:false, sick:true, buffPerm:caller.buffPerm||0, buffTemp:0 };
+        const summoned = { ...caller, tapped:false, sick:true, buffPerm:caller.buffPerm||0, buffTemp:0, attacksThisTurn:0 };
         attackerOwner.field.push(summoned);
         applyEtb(summoned, attackerOwner, defenderOwner);
         setMessage(attacker.name + "が仲間を呼んだ！" + summoned.name + "が場に出た！");
@@ -3641,9 +4030,18 @@
             "が直接攻撃！シールドを" + brokenNames.length + "枚割った！（" + brokenNames.join("、") + "が手札に加わった）" +
             ((attacker.abilities || []).includes("shield_draw") ? " お土産で1枚ドロー！" : "")
           );
+          if ((attacker.abilities || []).includes("self_destruct")) {
+            attackerOwner.field = attackerOwner.field.filter(c => c.uid !== attacker.uid);
+            attackerOwner.graveyard.push(attacker);
+            setMessage(attacker.name + "の自壊！攻撃後に三角コーナーへ送られた。");
+          }
           render();
           finishActionStep();
         } else {
+          if ((attacker.abilities || []).includes("self_destruct")) {
+            attackerOwner.field = attackerOwner.field.filter(c => c.uid !== attacker.uid);
+            attackerOwner.graveyard.push(attacker);
+          }
           endGame(S.turn === "player" ? "player" : "cpu");
         }
       }, 450);
@@ -3693,6 +4091,10 @@
         resultText += " " + defender.name + "の猛毒で" + attacker.name + "も道連れに！";
       }
 
+      // 自壊：攻撃後、勝敗に関係なく攻撃したクリーチャー自身を破壊する。
+      if ((attacker.abilities || []).includes("self_destruct") && !destroyIds.includes(attacker.uid)) {
+        destroyIds.push(attacker.uid);
+      }
       const attackerSurvived = !destroyIds.includes(attacker.uid);
       const defenderDestroyed = destroyIds.includes(defender.uid);
       let piercedShieldBreak = false;
@@ -3794,17 +4196,24 @@
   // ================= Turn flow =================
   function startTurn(who) {
     const p = who === "player" ? S.player : S.cpu;
-    p.field.forEach((c) => { c.tapped = false; c.sick = false; c.buffTemp = 0; });
+    p.field.forEach((c) => { c.tapped = false; c.sick = false; c.buffTemp = 0; c.attacksThisTurn = 0; });
     p.manaUsed = 0;
     p.manaChargesLeft = 1;
+    p.foodDiscountThisTurn = 0;
+    p.foodCostPenalty = Number(p.pendingFoodPenalty || 0);
+    p.pendingFoodPenalty = 0;
+    p.spellLocked = !!p.pendingSpellLock;
+    p.pendingSpellLock = false;
     // 有機栽培：素材が場にある限り、毎ターン開始時に成長。
     if (p.field.some(c => c.isMaterial)) {
       p.field.filter(c => (c.abilities || []).includes("organic_growth")).forEach(c => { c.buffPerm = (c.buffPerm || 0) + 1; });
     }
     p._cropRotationUsed = false;
+    p.field.forEach(c=>{ c._sacrificeUsed=false; c._zoneSummonUsed=false; });
     draw(p, 1);
     S.turn = who;
     S.selectedAttackerUid = null;
+    S.selectedFieldAbilityUid = null;
     S.selectedHandUid = null;
     S.pendingSpell = null;
 
@@ -3872,6 +4281,20 @@
         return { score: 3, target: null };
       case "extra_charge":
         return { score: hard ? 2 : 0, target: null };
+      case "food_discount_all":
+        return { score: cpu.hand.filter(c=>isUnitCard(c)).length >= 2 ? 7 : 0, target:null };
+      case "food_discount_next":
+        return { score: cpu.hand.some(c=>isUnitCard(c)&&actualCardCost(c,cpu,false)<=manaAvailable(cpu)+3) ? 6 : 0, target:null };
+      case "food_cost_penalty":
+        return { score: you.hand.filter(c=>isUnitCard(c)).length >= 2 ? 5 : 1, target:null };
+      case "spell_lock_next":
+        return { score: you.hand.some(c=>c.kind==="spell") ? 7 : 2, target:null };
+      case "legend_to_hand":
+        return cpu.deck.some(c => c.rarity === "legend") ? { score: hard ? 8 : 5, target:null } : null;
+      case "mass_mana_summon":
+        return cpu.manaZone.some(c => isUnitCard(c)) ? { score: cpu.manaZone.filter(c => isUnitCard(c)).length * 3 + 5, target:null } : null;
+      case "ultimate_evolve":
+        return cpu.field.some(c => isUnitCard(c) && !c.ultimateEvolved && (c.isCooked === true || String(c.id || "").startsWith("exp_") || c._evolved === true || c.subtype === "evolution")) ? { score: 10, target: cpu.field.filter(c => isUnitCard(c) && !c.ultimateEvolved && (c.isCooked === true || String(c.id || "").startsWith("exp_") || c._evolved === true || c.subtype === "evolution")).sort((a,b)=>effPower(b)-effPower(a))[0] } : null;
       case "grant_haste": {
         if (!hard) return null;
         const sickCreatures = cpu.field.filter((c) => c.sick);
@@ -3893,7 +4316,7 @@
   }
 
   function aiCastSpells(cpu, you) {
-    if (S.difficulty === "easy") return;
+    if (S.difficulty === "easy" || cpu.spellLocked) return;
     let progress = true, guard = 0;
     while (progress && guard < 10) {
       guard++;
@@ -3913,6 +4336,8 @@
         applySpellEffect(best.card.effect, cpu, you, best.target);
         cpu.graveyard.push(best.card);
         setMessage("CPUが" + best.card.name + "を使用した！");
+        S.lastAction = "📜 CPUが" + best.card.name + "を使用！";
+        showActionBanner("📜 " + best.card.name + " を使用！", "spell", true);
         progress = true;
       }
     }
@@ -3932,27 +4357,69 @@
       cpu.manaChargesLeft--;
     }
 
-    // 2. play the biggest affordable creature repeatedly
+    // 2. 割引・妨害・ドローなどを先に使い、後続の食べ物展開につなげる。
+    aiCastSpells(cpu, you);
+
+    // 3. 場の起動型アビリティを先に使う。マナ/三角コーナーからの展開で手数を増やす。
+    cpu.field.slice().forEach(source=>{
+      const abs=source.abilities||[];
+      if(source._zoneSummonUsed) return;
+      const key=abs.includes("mana_summon")?"manaZone":(abs.includes("grave_summon")?"graveyard":null);
+      if(!key) return;
+      const pool=cpu[key].filter(c=>isUnitCard(c)&&Number(c.cost||0)<=3);
+      if(pool.length){
+        const card=pool.sort((a,b)=>((b.power||0)-(a.power||0)))[0];
+        cpu[key]=cpu[key].filter(c=>c.uid!==card.uid);
+        cpu.field.push({...card,tapped:false,sick:true,buffPerm:card.buffPerm||0,buffTemp:0,attacksThisTurn:0});
+        source._zoneSummonUsed=true;
+        S.lastAction=(key==="manaZone"?"💧 CPUのマナ解放：":"♻️ CPUの三角再生：")+card.name+"！"; showActionBanner(S.lastAction.replace("CPUの", ""), "spell", true);
+      }
+    });
+
+    // 4. シナジー重視で展開。単純な「最大コスト」ではなく、割引役→相性の良い食べ物→大型の順.
     let playedSomething = true;
     while (playedSomething) {
       playedSomething = false;
-      let bestIdx = -1;
+      let bestIdx = -1, bestScore = -Infinity;
       cpu.hand.forEach((c, i) => {
-        if (isUnitCard(c) && c.cost <= manaAvailable(cpu)) {
-          if (bestIdx === -1 || c.cost > cpu.hand[bestIdx].cost) bestIdx = i;
-        }
+        if (!isUnitCard(c)) return;
+        const cost = actualCardCost(c, cpu, false);
+        if (cost > manaAvailable(cpu)) return;
+        let score = c.power * 1.4 - cost * 0.5;
+        const abs=c.abilities||[];
+        if (abs.includes("tri_discount")) score += cpu.hand.filter(x=>isUnitCard(x)).length >= 3 ? 7 : 2;
+        if (abs.includes("combo") && cpu.field.some(x=>x.attr===c.attr)) score += 5;
+        if (abs.includes("chef") || abs.includes("recipe_master")) score += cpu.hand.some(x=>x.kind==="recipe") ? 5 : 1;
+        if (abs.includes("mana_summon") && cpu.manaZone.some(x=>isUnitCard(x)&&x.cost<=3)) score += 7;
+        if (abs.includes("grave_summon") && cpu.graveyard.some(x=>isUnitCard(x)&&x.cost<=3)) score += 7;
+        if (abs.includes("double_attack")) score += cpu.field.length===0 ? 2 : 6;
+        if (abs.includes("guardian") && you.field.length>0) score += 2;
+        if (score>bestScore){bestScore=score;bestIdx=i;}
       });
-      if (bestIdx !== -1) {
-        const card = cpu.hand.splice(bestIdx, 1)[0];
-        cpu.manaUsed += card.cost;
-        const creature = { ...card, tapped: false, sick: !(card.abilities || []).includes("haste"), buffPerm: 0, buffTemp: 0 };
-        cpu.field.push(creature);
-        applyEtb(creature, cpu, you);
-        playedSomething = true;
+      if(bestIdx!==-1){
+        const card=cpu.hand.splice(bestIdx,1)[0];
+        const actual=actualCardCost(card,cpu,false);
+        if(isUnitCard(card)&&cpu.nextFoodDiscount>0) cpu.nextFoodDiscount=0;
+        cpu.manaUsed+=actual;
+        const creature={...card,tapped:false,sick:!(card.abilities||[]).includes("haste"),buffPerm:0,buffTemp:0,attacksThisTurn:0};
+        if((creature.abilities||[]).includes("combo")&&cpu.field.some(x=>x.attr===creature.attr)) creature.buffPerm=(creature.buffPerm||0)+2;
+        cpu.field.push(creature); applyEtb(creature,cpu,you);
+        playedSomething=true; S.lastAction="🍽️ CPUが"+card.name+"を展開！"; showActionBanner("🍽️ " + card.name + " を場に出した！", "summon", true);
       }
     }
 
-    // 3. cast spells with remaining mana
+    // 生贄役がいる場合、不要な小型を墓地へ送り次の大型を安くする。
+    const sacrificeSource=cpu.field.find(c=>(c.abilities||[]).includes("sacrifice")&&!c._sacrificeUsed);
+    if(sacrificeSource){
+      const fodder=cpu.field.filter(c=>c.uid!==sacrificeSource.uid&&isUnitCard(c)&&Number(c.cost||0)<=2).slice(0,2);
+      if(fodder.length){
+        fodder.forEach(c=>{cpu.field=cpu.field.filter(x=>x.uid!==c.uid);cpu.graveyard.push(c);});
+        sacrificeSource._sacrificeUsed=true; cpu.nextFoodDiscount=(cpu.nextFoodDiscount||0)+fodder.length;
+        S.lastAction="🗑️ CPUが生贄を使用！食べ物コスト-"+fodder.length; showActionBanner("🗑️ 生贄を使用！食べ物コスト-"+fodder.length, "spell", true);
+      }
+    }
+
+    // 5. 展開後に残ったマナでもう一度スペルを評価。
     aiCastSpells(cpu, you);
 
     render();
@@ -4025,7 +4492,25 @@
       if (S.over) { clearInterval(check); return; }
       if (!S.locked) {
         clearInterval(check);
-        setTimeout(() => runCpuAttacks(attackerUids, idx + 1), 250);
+        const again = !S.over && cpu.field.some(c=>c.uid===attacker.uid) &&
+          (attacker.abilities||[]).includes("double_attack") && Number(attacker.attacksThisTurn||0) < 2;
+        if (again) {
+          setTimeout(() => {
+            if (!S.over) {
+              const decision2 = pickAiTarget(attacker, you, S.difficulty);
+              if (decision2.attack) {
+                S.turn="cpu"; S.locked=true;
+                performAttack(attacker.uid, decision2.targetUid);
+                const wait2=setInterval(()=>{
+                  if(S.over){clearInterval(wait2);return;}
+                  if(!S.locked){clearInterval(wait2);setTimeout(()=>runCpuAttacks(attackerUids,idx+1),250);}
+                },120);
+              } else runCpuAttacks(attackerUids,idx+1);
+            }
+          },250);
+        } else {
+          setTimeout(() => runCpuAttacks(attackerUids, idx + 1), 250);
+        }
       }
     }, 120);
   }
@@ -4079,6 +4564,15 @@
     overlay.classList.add("show");
   }
 
+
+  if(typeof resolveSacrifice==="function") {
+    const _resolveSacrifice=resolveSacrifice;
+    resolveSacrifice=function(){ const before=JSON.stringify(S.player); _resolveSacrifice.apply(this,arguments); if(onlineMode&&!onlineApplying&&JSON.stringify(S.player)!==before) onlineSendState(); };
+  }
+  if(typeof resolveZoneSummon==="function") {
+    const _resolveZoneSummon=resolveZoneSummon;
+    resolveZoneSummon=function(){ const before=JSON.stringify(S.player); _resolveZoneSummon.apply(this,arguments); if(onlineMode&&!onlineApplying&&JSON.stringify(S.player)!==before) onlineSendState(); };
+  }
 
   const _chargeMana=chargeMana;
   chargeMana=function(uid){const b=S.player.manaZone.length;_chargeMana(uid);if(onlineMode&&!onlineApplying&&S.player.manaZone.length!==b)onlineSendState();};
@@ -4136,7 +4630,9 @@
     S.turn="cpu";
     S.selectedAttackerUid=null;
     S.selectedHandUid=null;
+    S.selectedFieldAbilityUid=null;
     S.pendingSpell=null;
+    S.pendingSacrifice=null;
     S.locked=false;
     render();
     setMessage("相手のターンです。相手の操作を待っています…");
@@ -4215,6 +4711,16 @@
   el("graveyardCloseBtn").addEventListener("click", () => {
     el("graveyardOverlay").classList.remove("show");
   });
+  function showMana(owner,label){
+    el("manaTitle").textContent=label+"のマナゾーン（"+(owner.manaZone||[]).length+"枚）";
+    const g=el("manaGrid"); g.innerHTML="";
+    if(!owner.manaZone || !owner.manaZone.length){const e=document.createElement("div");e.className="zone-empty";e.textContent="マナカードがありません";g.appendChild(e);}
+    else owner.manaZone.forEach(c=>g.appendChild(cardNode(c,{noInfoBtn:false})));
+    el("manaOverlay").classList.add("show");
+  }
+  el("playerManaViewBtn").addEventListener("click",()=>{if(S)showMana(S.player,"あなた");});
+  el("cpuManaViewBtn").addEventListener("click",()=>{if(S)showMana(S.cpu,onlineMode?"相手":"CPU");});
+  el("manaCloseBtn").addEventListener("click",()=>el("manaOverlay").classList.remove("show"));
 
   // ================= Boot =================
   (function boot() {
